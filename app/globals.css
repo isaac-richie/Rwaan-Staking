@@ -67,6 +67,11 @@ body {
   will-change: transform;
 }
 
+.glass,
+.glass::before {
+  will-change: transform, opacity;
+}
+
 .glass-solid {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -387,6 +392,47 @@ body {
   .animate-bubble-float-1,
   .animate-bubble-float-2,
   .animate-bubble-float-3 {
+    animation: none !important;
+  }
+
+  .bubble {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    animation: none !important;
+    background-image: linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.9),
+      rgba(2, 6, 23, 0.88)
+    );
+  }
+
+  .glass::before {
+    display: none;
+  }
+
+  .animate-gradient-pan,
+  .animate-gradient-shift,
+  .animate-aura-breathe,
+  .animate-hero-glow,
+  .animate-liquid-mesh,
+  .animate-bubble-float-1,
+  .animate-bubble-float-2,
+  .animate-bubble-float-3,
+  .animate-orb-float-slow,
+  .animate-orb-float-slower,
+  .animate-orb-drift,
+  .animate-particle-float,
+  .animate-particle-drift,
+  .animate-capital-breathe,
+  .animate-halo-expand,
+  .animate-pulse-glow,
+  .animate-flow-glow {
     animation: none !important;
   }
 

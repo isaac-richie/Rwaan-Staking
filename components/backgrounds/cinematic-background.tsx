@@ -10,15 +10,23 @@ export function CinematicBackground({ className }: { className?: string }) {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    let rafId: number | null = null;
+    let latestX = 0;
+    let latestY = 0;
 
     const handleMove = (event: PointerEvent) => {
       const rect = container.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
-      const dx = (x / rect.width - 0.5) * 80;
-      const dy = (y / rect.height - 0.5) * 80;
-      container.style.setProperty("--parallax-x", `${dx}px`);
-      container.style.setProperty("--parallax-y", `${dy}px`);
+      latestX = (x / rect.width - 0.5) * 80;
+      latestY = (y / rect.height - 0.5) * 80;
+
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        container.style.setProperty("--parallax-x", `${latestX}px`);
+        container.style.setProperty("--parallax-y", `${latestY}px`);
+        rafId = null;
+      });
     };
 
     const handleLeave = () => {
@@ -32,6 +40,7 @@ export function CinematicBackground({ className }: { className?: string }) {
     return () => {
       window.removeEventListener("pointermove", handleMove);
       window.removeEventListener("pointerleave", handleLeave);
+      if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, []);
 
