@@ -56,12 +56,13 @@ export function formatDateFromSeconds(seconds: number) {
   });
 }
 
-export function formatUsd(value?: number, maxFraction = 2) {
+export function formatUsd(value?: number, maxFraction = 2, locale = "en-US") {
   if (value === undefined || value === null) return "—";
   if (!Number.isFinite(value)) return "—";
-  return value.toLocaleString(undefined, {
+  return value.toLocaleString(locale, {
     style: "currency",
     currency: "USD",
+    currencyDisplay: "symbol",
     maximumFractionDigits: maxFraction,
   });
 }

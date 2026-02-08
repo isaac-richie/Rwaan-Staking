@@ -11,7 +11,7 @@ import { usePositionsWithRewards } from "@/hooks/use-positions";
 import { useMounted } from "@/hooks/use-mounted";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { RWAN_DECIMALS, RWAN_TOKEN_ADDRESS } from "@/lib/utils/constants";
-import { formatToken } from "@/lib/utils/format";
+import { formatToken, formatUsd } from "@/lib/utils/format";
 import dynamic from "next/dynamic";
 import { useRwanMarket } from "@/components/crypto/use-rwan-market";
 
@@ -121,11 +121,7 @@ export function Hero() {
               {isFdvLoading ? (
                 <Skeleton className="h-6 w-24" />
               ) : (
-                fdv?.toLocaleString(undefined, {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 0,
-                }) ?? "—"
+                fdv !== null ? formatUsd(fdv, 0) : "—"
               )}
             </div>
           </div>

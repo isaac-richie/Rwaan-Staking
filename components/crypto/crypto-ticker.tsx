@@ -19,7 +19,7 @@ export function CryptoTicker({
   return (
     <div
       className={cn(
-        "relative overflow-hidden border-y border-white/15 bg-[#0a0e1a]/95",
+        "relative overflow-hidden border-y border-white/15 bg-[#06080d]",
         "before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-r before:from-[#F3BA2F]/10 before:via-transparent before:to-[#F3BA2F]/10 before:opacity-60",
         "after:pointer-events-none after:absolute after:inset-0 after:rounded-none after:border-y after:border-primary/25 after:opacity-40",
         compact && "opacity-90",
