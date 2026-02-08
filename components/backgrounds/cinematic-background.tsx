@@ -9,10 +9,6 @@ export function CinematicBackground({ className }: { className?: string }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
 
-  if (isMobile) {
-    return null;
-  }
-
   useEffect(() => {
     if (isMobile) return;
     const container = containerRef.current;
@@ -50,6 +46,10 @@ export function CinematicBackground({ className }: { className?: string }) {
       if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, [isMobile]);
+
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <div
