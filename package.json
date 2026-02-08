@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-verify": "^3.0.9",
-    "@nomiclabs/hardhat-etherscan": "^3.1.8",
     "@openzeppelin/contracts": "5.0.2",
     "@types/node": "20.14.10",
     "@types/react": "18.3.3",
