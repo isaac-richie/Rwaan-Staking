@@ -10,12 +10,11 @@ type RwanMarketResponse = {
   market_data?: RwanMarketData;
 };
 
-const RWAN_FDV_FALLBACK = 42_000_000;
-
 export function useRwanMarket() {
   const [fdv, setFdv] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasSuccess, setHasSuccess] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -32,12 +31,19 @@ export function useRwanMarket() {
         const data = (await response.json()) as RwanMarketResponse;
         const nextFdv = data.market_data?.fully_diluted_valuation?.usd ?? null;
         if (active) {
-          setFdv(nextFdv ?? RWAN_FDV_FALLBACK);
+          if (nextFdv !== null) {
+            setFdv(nextFdv);
+            setHasSuccess(true);
+          } else if (!hasSuccess) {
+            setFdv(null);
+          }
         }
       } catch (err) {
         if (active) {
           setError(err instanceof Error ? err.message : "Unable to fetch FDV.");
-          setFdv(RWAN_FDV_FALLBACK);
+          if (!hasSuccess) {
+            setFdv(null);
+          }
         }
       } finally {
         if (active) {
