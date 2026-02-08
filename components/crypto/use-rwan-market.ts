@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type RwanMarketData = {
   fully_diluted_valuation?: { usd?: number };
@@ -14,7 +14,7 @@ export function useRwanMarket() {
   const [fdv, setFdv] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasSuccess, setHasSuccess] = useState(false);
+  const hasSuccessRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -33,15 +33,15 @@ export function useRwanMarket() {
         if (active) {
           if (nextFdv !== null) {
             setFdv(nextFdv);
-            setHasSuccess(true);
-          } else if (!hasSuccess) {
+            hasSuccessRef.current = true;
+          } else if (!hasSuccessRef.current) {
             setFdv(null);
           }
         }
       } catch (err) {
         if (active) {
           setError(err instanceof Error ? err.message : "Unable to fetch FDV.");
-          if (!hasSuccess) {
+          if (!hasSuccessRef.current) {
             setFdv(null);
           }
         }

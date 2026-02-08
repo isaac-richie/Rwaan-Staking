@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Inter, Sora } from "next/font/google";
+import { Space_Grotesk, Syne } from "next/font/google";
 
 import { SiteHeader } from "@/components/site-header";
 import { ToastRoot } from "@/components/toast-root";
@@ -13,14 +13,14 @@ import { WalletStateManager } from "@/components/wallet-state-manager";
 import { ScrollStabilityManager } from "@/components/scroll-stability-manager";
 import { Providers } from "./providers";
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-space",
 });
 
-const sora = Sora({
+const syne = Syne({
   subsets: ["latin"],
-  variable: "--font-sora",
+  variable: "--font-syne",
 });
 
 export const metadata: Metadata = {
@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${inter.variable} ${sora.variable} font-sans bg-background text-foreground`}
+        className={`${spaceGrotesk.variable} ${syne.variable} font-sans bg-background text-foreground`}
       >
         <Providers>
           <ToastRoot>

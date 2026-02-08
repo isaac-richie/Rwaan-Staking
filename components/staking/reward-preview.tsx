@@ -112,7 +112,15 @@ export function RewardPreview() {
           <div className="text-xs text-muted-foreground">
             {amountUsd !== null ? `≈ ${formatUsd(amountUsd)}` : "—"}
           </div>
-          <Select value={selectedPlanId} onValueChange={setSelectedPlanId}>
+          <Select
+            value={selectedPlanId}
+            onValueChange={setSelectedPlanId}
+            onOpenChange={(open) => {
+              if (open && typeof document !== "undefined") {
+                (document.activeElement as HTMLElement | null)?.blur();
+              }
+            }}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select plan" />
             </SelectTrigger>
