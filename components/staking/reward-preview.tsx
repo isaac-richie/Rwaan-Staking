@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
 import { useMounted } from "@/hooks/use-mounted";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { STAKING_PLANS } from "@/lib/utils/constants";
 import { formatBps, formatUsd } from "@/lib/utils/format";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
@@ -17,6 +18,7 @@ const YEAR_SECONDS = 365 * 24 * 60 * 60;
 
 export function RewardPreview() {
   const mounted = useMounted();
+  const isMobile = useIsMobile();
   const [amount, setAmount] = useState("1000");
   const [selectedPlanId, setSelectedPlanId] = useState("flexible");
   const lockOptions = useLockOptions();
@@ -89,10 +91,10 @@ export function RewardPreview() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.3 }}
+      initial={isMobile ? false : { opacity: 0, y: 12 }}
+      whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+      viewport={isMobile ? undefined : { once: true, amount: 0.2 }}
+      transition={isMobile ? undefined : { duration: 0.3 }}
       className="glass glass-solid interactive-card rounded-2xl p-5 sm:p-6"
     >
       <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">

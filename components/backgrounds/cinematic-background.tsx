@@ -54,10 +54,10 @@ export function CinematicBackground({ className }: { className?: string }) {
       )}
     >
       {/* Deep Navy → Near-Black → Faint Indigo Base Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#03060f] to-[#0a0b18]" />
+      <div className="bg-layer-base absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#03060f] to-[#0a0b18]" />
       
       {/* BNB Liquid Atmosphere - Large Volumetric Bubbles */}
-      <div className="absolute inset-0 opacity-90">
+      <div className="bg-layer-bubbles absolute inset-0 opacity-90">
         {/* Bubble 1: Large Gold - Bottom Left */}
         <div className="absolute -left-[15%] bottom-[-20%] h-[700px] w-[700px] rounded-full bg-gradient-to-br from-[#F3BA2F]/12 via-[#FFC947]/10 to-transparent blur-[80px] animate-liquid-drift-1" />
         
@@ -75,21 +75,21 @@ export function CinematicBackground({ className }: { className?: string }) {
       </div>
       
       {/* Vibrant Animated Aura - Navy, Violet, Gold */}
-      <div className="absolute inset-0 opacity-60 animate-aura-breathe">
+      <div className="bg-layer-aura absolute inset-0 opacity-60 animate-aura-breathe">
         <div className="absolute -left-[20%] top-[-10%] h-[600px] w-[600px] rounded-full bg-gradient-to-br from-[#1e3a8a]/30 via-[#7c3aed]/20 to-transparent blur-[180px]" />
         <div className="absolute right-[-15%] top-[15%] h-[550px] w-[550px] rounded-full bg-gradient-to-br from-[#7c3aed]/25 via-[#F3BA2F]/20 to-transparent blur-[160px]" />
         <div className="absolute left-[25%] bottom-[-20%] h-[650px] w-[650px] rounded-full bg-gradient-to-br from-[#F3BA2F]/22 via-[#1e3a8a]/15 to-transparent blur-[200px]" />
       </div>
       
       {/* BNB Gold Orbs - Existing depth */}
-      <div className="absolute inset-0 opacity-70">
+      <div className="bg-layer-orbs absolute inset-0 opacity-70">
         <div className="absolute -left-40 top-[-10%] h-[520px] w-[520px] rounded-full bg-[#F3BA2F]/20 blur-[140px] animate-orb-float-slower" />
         <div className="absolute right-[-12%] top-[20%] h-[420px] w-[420px] rounded-full bg-[#F3BA2F]/25 blur-[120px] animate-orb-float-slow" />
         <div className="absolute left-[30%] bottom-[-15%] h-[480px] w-[480px] rounded-full bg-[#F3BA2F]/18 blur-[160px] animate-orb-drift" />
       </div>
       
       {/* Enhanced Light Diffusion Particles */}
-      <div className="absolute inset-0 hidden sm:block">
+      <div className="bg-layer-particles absolute inset-0 hidden sm:block">
         {/* Gold particles */}
         <div className="absolute left-[12%] top-[18%] h-2 w-2 rounded-full bg-[#F3BA2F]/25 blur-[6px] animate-particle-float" />
         <div className="absolute right-[28%] top-[70%] h-1.5 w-1.5 rounded-full bg-[#F3BA2F]/20 blur-[6px] animate-particle-drift" />
@@ -107,22 +107,22 @@ export function CinematicBackground({ className }: { className?: string }) {
       </div>
       
       {/* Ambient White Light */}
-      <div className="absolute inset-0">
+      <div className="bg-layer-ambient absolute inset-0">
         <div className="absolute right-[10%] top-[10%] h-[260px] w-[260px] rounded-full bg-white/10 blur-[120px] animate-orb-float-slower" />
         <div className="absolute left-[8%] bottom-[8%] h-[220px] w-[220px] rounded-full bg-white/8 blur-[110px] animate-orb-float-slow" />
       </div>
       
       {/* Gradient Pan Layer */}
-      <div className="absolute inset-0 animate-gradient-pan bg-[radial-gradient(circle_at_50%_50%,rgba(243,186,47,0.08),transparent_60%),linear-gradient(120deg,rgba(167,139,250,0.04),transparent_40%)] bg-[length:160%_160%] opacity-70" />
+      <div className="bg-layer-gradient-pan absolute inset-0 animate-gradient-pan bg-[radial-gradient(circle_at_50%_50%,rgba(243,186,47,0.08),transparent_60%),linear-gradient(120deg,rgba(167,139,250,0.04),transparent_40%)] bg-[length:160%_160%] opacity-70" />
       
       {/* Gradient Shift Layer */}
-      <div className="absolute inset-0 animate-gradient-shift bg-[radial-gradient(circle_at_15%_15%,rgba(243,186,47,0.12),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(124,58,237,0.08),transparent_35%)] opacity-80" />
+      <div className="bg-layer-gradient-shift absolute inset-0 animate-gradient-shift bg-[radial-gradient(circle_at_15%_15%,rgba(243,186,47,0.12),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(124,58,237,0.08),transparent_35%)] opacity-80" />
 
       {/* Liquid Mesh Overlay */}
-      <div className="absolute inset-[-10%] animate-liquid-mesh bg-[conic-gradient(from_120deg,rgba(243,186,47,0.18),rgba(15,23,42,0.05),rgba(124,58,237,0.12),rgba(15,23,42,0.05),rgba(52,211,153,0.1),rgba(15,23,42,0.05),rgba(243,186,47,0.16))] mix-blend-screen blur-[60px] opacity-50" />
+      <div className="bg-layer-mesh absolute inset-[-10%] animate-liquid-mesh bg-[conic-gradient(from_120deg,rgba(243,186,47,0.18),rgba(15,23,42,0.05),rgba(124,58,237,0.12),rgba(15,23,42,0.05),rgba(52,211,153,0.1),rgba(15,23,42,0.05),rgba(243,186,47,0.16))] mix-blend-screen blur-[60px] opacity-50" />
 
       {/* Slow Bubble Drift */}
-      <div className="absolute inset-0">
+      <div className="bg-layer-bubble-interactive absolute inset-0">
         <div className="bubble bubble-depth-1 left-[12%] top-[12%] h-[220px] w-[220px]">
           <div className="bubble-core animate-bubble-float-1 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.28),rgba(243,186,47,0.2),transparent_70%)]" />
         </div>

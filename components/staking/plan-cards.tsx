@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
 import { useMounted } from "@/hooks/use-mounted";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { STAKING_PLANS } from "@/lib/utils/constants";
 import { formatBps, formatDuration } from "@/lib/utils/format";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
@@ -18,6 +19,7 @@ const cardHover = { y: -6 };
 
 export function PlanCards() {
   const mounted = useMounted();
+  const isMobile = useIsMobile();
   const lockOptions = useLockOptions();
   const totalStaked = useTotalStaked();
   const aprTiers = useAprTiers();
@@ -59,8 +61,8 @@ export function PlanCards() {
           return (
         <motion.div
           key={plan.id}
-          whileHover={cardHover}
-          transition={{ duration: 0.2 }}
+          whileHover={isMobile ? undefined : cardHover}
+          transition={isMobile ? undefined : { duration: 0.2 }}
           className={cn("glass glass-solid interactive-card rounded-2xl p-5 sm:p-6", getCardGlow('staking'))}
         >
           <div className="flex items-center justify-between">

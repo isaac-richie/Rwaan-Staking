@@ -94,7 +94,7 @@ export function Dashboard() {
               <PositionsTable />
             ) : (
               <div className="glass glass-solid rounded-2xl p-6 text-sm text-muted-foreground">
-                Connect wallet to view your dashboard.
+                Wallet required to view your dashboard.
               </div>
             )}
             <div className="flex flex-wrap items-center gap-3">

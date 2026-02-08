@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils/cn";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
 import { useCryptoPrices } from "@/components/crypto/use-crypto-prices";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 export function StakingActionsPanel() {
   const { address } = useAccount();
@@ -43,6 +44,7 @@ export function StakingActionsPanel() {
   const totalStaked = useTotalStaked();
   const aprTiers = useAprTiers();
   const currentApr = useCurrentAprBps();
+  const isMobile = useIsMobile();
   const { toast } = useToast();
   const { referrer, shareUrl } = useReferral(address);
   const { prices } = useCryptoPrices();
@@ -214,7 +216,7 @@ export function StakingActionsPanel() {
       <CardContent className="space-y-6">
         {!address ? (
           <EmptyState
-            title="Connect wallet"
+            title="Wallet required"
             description="Connect your wallet to start staking $Rwaan."
           />
         ) : (
@@ -251,9 +253,9 @@ export function StakingActionsPanel() {
                     <motion.button
                       key={plan.id}
                       type="button"
-                      whileHover={{ y: -3 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ duration: 0.18 }}
+                      whileHover={isMobile ? undefined : { y: -3 }}
+                      whileTap={isMobile ? undefined : { scale: 0.98 }}
+                      transition={isMobile ? undefined : { duration: 0.18 }}
                       onClick={() => setSelectedPlanId(plan.id)}
                       className={cn(
                         "relative glass rounded-2xl border px-4 py-3 text-left transition-all duration-200 sm:px-5 sm:py-4",
@@ -330,7 +332,7 @@ export function StakingActionsPanel() {
             {disabled && (
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
                 {!address ? (
-                  "Connect wallet to stake"
+                  "Wallet required to stake"
                 ) : !parsedAmount || parsedAmount <= 0n ? (
                   "Enter amount to stake"
                 ) : tokenAddress.isLoading ? (
@@ -347,7 +349,7 @@ export function StakingActionsPanel() {
               {/* CRITICAL: Only show buttons if wallet is connected */}
               {!address ? (
                 <div className="w-full rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-sm font-semibold text-amber-100">
-                  🔒 Connect wallet to stake
+                  🔒 Wallet required to stake
                 </div>
               ) : (
                 <>
@@ -405,7 +407,7 @@ export function StakingActionsPanel() {
               <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Input
                   value={shareUrl}
-                  placeholder="Connect wallet to generate your link"
+                  placeholder="Wallet required to generate your link"
                   readOnly
                 />
                 <Button

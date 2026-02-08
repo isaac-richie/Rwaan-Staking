@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { usePositionsWithRewards } from "@/hooks/use-positions";
 import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
 import { useMounted } from "@/hooks/use-mounted";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { RWAN_DECIMALS } from "@/lib/utils/constants";
 import { formatBps, formatToken } from "@/lib/utils/format";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
@@ -16,6 +17,7 @@ export function StatsRow({
   showData?: boolean;
 }) {
   const mounted = useMounted();
+  const isMobile = useIsMobile();
   const totalStaked = useTotalStaked();
   const { positions } = usePositionsWithRewards();
   const lockOptions = useLockOptions();
@@ -66,11 +68,11 @@ export function StatsRow({
   if (!mounted) {
     return (
       <div className="grid gap-4 md:grid-cols-3">
-      <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
-        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
-      >
+        <motion.div
+          whileHover={isMobile ? undefined : { y: -4 }}
+          transition={isMobile ? undefined : { duration: 0.2 }}
+          className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+        >
           <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Total Staked
           </div>
@@ -78,11 +80,11 @@ export function StatsRow({
             <Skeleton className="h-6 w-32" />
           </div>
         </motion.div>
-      <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
-        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
-      >
+        <motion.div
+          whileHover={isMobile ? undefined : { y: -4 }}
+          transition={isMobile ? undefined : { duration: 0.2 }}
+          className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+        >
           <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Base APR
           </div>
@@ -90,11 +92,11 @@ export function StatsRow({
             <Skeleton className="h-6 w-28" />
           </div>
         </motion.div>
-      <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
-        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
-      >
+        <motion.div
+          whileHover={isMobile ? undefined : { y: -4 }}
+          transition={isMobile ? undefined : { duration: 0.2 }}
+          className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+        >
           <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             {showData ? "Your Claimable" : "Connect Wallet"}
           </div>
@@ -109,8 +111,8 @@ export function StatsRow({
   return (
     <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
       <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
+        whileHover={isMobile ? undefined : { y: -4 }}
+        transition={isMobile ? undefined : { duration: 0.2 }}
         className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
       >
         <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -127,8 +129,8 @@ export function StatsRow({
         </div>
       </motion.div>
       <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
+        whileHover={isMobile ? undefined : { y: -4 }}
+        transition={isMobile ? undefined : { duration: 0.2 }}
         className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
       >
         <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -145,8 +147,8 @@ export function StatsRow({
         </div>
       </motion.div>
       <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
+        whileHover={isMobile ? undefined : { y: -4 }}
+        transition={isMobile ? undefined : { duration: 0.2 }}
         className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
       >
         <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">

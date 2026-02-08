@@ -439,4 +439,20 @@ body {
   .bubble {
     transition: none !important;
   }
+
+  .bg-layer-mesh,
+  .bg-layer-particles,
+  .bg-layer-gradient-pan,
+  .bg-layer-gradient-shift,
+  .bg-layer-bubble-interactive {
+    display: none !important;
+  }
+
+  .bg-layer-aura,
+  .bg-layer-orbs,
+  .bg-layer-ambient,
+  .bg-layer-bubbles {
+    opacity: 0.35 !important;
+    filter: blur(90px);
+  }
 }

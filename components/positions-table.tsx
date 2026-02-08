@@ -178,7 +178,7 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm">
         <EmptyState
-          title="Connect wallet"
+          title="Wallet required"
           description="Connect your wallet to view your staking positions."
         />
       </div>
@@ -366,7 +366,7 @@ function PositionRow({
             {/* CRITICAL: Only show buttons if wallet connected */}
             {!walletConnected ? (
               <div className="text-xs text-muted-foreground italic">
-                Connect wallet
+                Wallet required
               </div>
             ) : (
               <>

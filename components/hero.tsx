@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { usePositionsWithRewards } from "@/hooks/use-positions";
 import { useMounted } from "@/hooks/use-mounted";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { RWAN_DECIMALS, RWAN_TOKEN_ADDRESS } from "@/lib/utils/constants";
 import { formatToken } from "@/lib/utils/format";
 import dynamic from "next/dynamic";
@@ -30,6 +31,7 @@ export function Hero() {
   const { fdv, isLoading: isFdvLoading } = useRwanMarket();
   const { toast } = useToast();
   const mounted = useMounted();
+  const isMobile = useIsMobile();
   const [showDetails, setShowDetails] = useState(false);
   const totalRewards = positions.reduce(
     (sum, position) => sum + position.pendingRewards,
@@ -38,9 +40,9 @@ export function Hero() {
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      initial={isMobile ? false : { opacity: 0, y: 24 }}
+      animate={isMobile ? undefined : { opacity: 1, y: 0 }}
+      transition={isMobile ? undefined : { duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="glass glass-solid relative overflow-hidden rounded-2xl p-6 sm:rounded-[28px] sm:p-8 md:p-14"
     >
       <div className="pointer-events-none absolute -inset-10 -z-10 rounded-[32px] bg-[#F3BA2F]/25 blur-[140px] animate-hero-glow" />
@@ -56,10 +58,10 @@ export function Hero() {
           <AnimatePresence initial={false}>
             {showDetails ? (
               <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
+                initial={isMobile ? false : { opacity: 0, y: 8 }}
+                animate={isMobile ? undefined : { opacity: 1, y: 0 }}
+                exit={isMobile ? undefined : { opacity: 0, y: -8 }}
+                transition={isMobile ? undefined : { duration: 0.2 }}
                 className="text-sm text-muted-foreground md:text-base"
               >
                 Stake with confidence. Track every position, claim rewards
@@ -139,14 +141,14 @@ export function Hero() {
                   `${formatToken(totalRewards, RWAN_DECIMALS)} $Rwaan`
                 )
               ) : (
-                "Connect wallet"
+                "Wallet required"
               )}
             </div>
           </div>
           <div className="text-xs text-muted-foreground">
             {address
               ? "Live preview. Personalized to your wallet."
-              : "Connect wallet to view your rewards."}
+              : "Connect to view rewards."}
           </div>
         </div>
       </div>

@@ -227,7 +227,7 @@ function StepEmail({
           )}
         />
         <div className="text-xs text-muted-foreground">
-          Wallet: {wallet ? `${wallet.slice(0, 6)}...${wallet.slice(-4)}` : "Connect wallet"}
+          Wallet: {wallet ? `${wallet.slice(0, 6)}...${wallet.slice(-4)}` : "Wallet required"}
         </div>
         <div className="text-xs text-muted-foreground">
           We only use this to send Perpdex access updates.

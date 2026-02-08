@@ -107,7 +107,7 @@ export function StakePanel() {
       <CardContent className="space-y-6">
         {!address ? (
           <EmptyState
-            title="Connect wallet"
+            title="Wallet required"
             description="Connect your wallet to start staking RWAN."
           />
         ) : (
