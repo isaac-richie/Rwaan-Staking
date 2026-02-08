@@ -444,15 +444,16 @@ body {
   .bg-layer-particles,
   .bg-layer-gradient-pan,
   .bg-layer-gradient-shift,
-  .bg-layer-bubble-interactive {
-    display: none !important;
-  }
-
+  .bg-layer-bubble-interactive,
+  .bg-layer-bubbles,
   .bg-layer-aura,
   .bg-layer-orbs,
   .bg-layer-ambient,
-  .bg-layer-bubbles {
-    opacity: 0.35 !important;
-    filter: blur(90px);
+  .bubble {
+    display: none !important;
+  }
+
+  .cinematic-bg {
+    background: #0a0e1a;
   }
 }
