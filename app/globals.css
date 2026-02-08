@@ -1,0 +1,396 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 30% 4%;
+  --foreground: 210 40% 98%;
+  --card: 222 28% 7%;
+  --card-foreground: 210 40% 98%;
+  --muted: 215 20% 12%;
+  --muted-foreground: 215 18% 72%;
+  --primary: 45 90% 60%;
+  --primary-foreground: 222 30% 8%;
+  --accent: 38 78% 55%;
+  --accent-foreground: 222 30% 8%;
+  --border: 220 14% 16%;
+  --ring: 45 90% 60%;
+  --glow: 45 100% 66%;
+  
+  /* BNB Chain Vibrant Accents */
+  --navy: 224 35% 15%;
+  --violet-muted: 265 30% 45%;
+  --violet: 265 45% 60%;
+  --emerald-muted: 160 50% 45%;
+  --emerald: 160 60% 55%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  min-height: 100vh;
+  background-image: radial-gradient(
+      circle at 20% 10%,
+      rgba(234, 179, 8, 0.12),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 80% 0%,
+      rgba(255, 255, 255, 0.08),
+      transparent 45%
+    ),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.95));
+  background-attachment: scroll;
+}
+
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-glass;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02) 40%, rgba(243, 186, 47, 0.06) 70%, rgba(124, 58, 237, 0.05)),
+    radial-gradient(circle at 20% 10%, rgba(243, 186, 47, 0.06), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(52, 211, 153, 0.05), transparent 40%);
+  background-size: 200% 200%;
+  animation: glass-sheen 32s ease-in-out infinite;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.glass-solid {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-image: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.9),
+    rgba(2, 6, 23, 0.88)
+  );
+  animation: none !important;
+}
+
+.glass-solid::before {
+  display: none;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 255, 255, 0.07),
+      transparent 55%
+    ),
+    linear-gradient(
+      120deg,
+      transparent 15%,
+      rgba(243, 186, 47, 0.14) 45%,
+      transparent 75%
+    );
+  opacity: 0.4;
+  mix-blend-mode: screen;
+  animation: liquid-sheen 22s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 12px 24px rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+}
+
+.interactive-card {
+  @apply transition-all duration-200 ease-soft-spring hover:-translate-y-1 hover:border-white/20 hover:bg-white/10;
+}
+
+.badge-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transform: translateX(-120%);
+  transition: transform 1s ease;
+}
+
+.badge-shimmer:hover::after {
+  transform: translateX(120%);
+}
+
+/* Capital Button Halo */
+.bg-gradient-radial {
+  background-image: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* Sectional Card Illumination */
+.card-glow-staking {
+  box-shadow: 
+    0 0 0 1px rgba(250, 204, 21, 0.08),
+    0 0 24px rgba(250, 204, 21, 0.06),
+    0 1px 0 rgba(255,255,255,0.06) inset, 
+    0 24px 80px rgba(0,0,0,0.45);
+  transition: box-shadow 0.3s ease;
+}
+
+.card-glow-staking:hover {
+  box-shadow: 
+    0 0 0 1px rgba(250, 204, 21, 0.12),
+    0 0 32px rgba(250, 204, 21, 0.09),
+    0 1px 0 rgba(255,255,255,0.08) inset, 
+    0 24px 80px rgba(0,0,0,0.45);
+}
+
+.card-glow-rewards {
+  box-shadow: 
+    0 0 0 1px rgba(52, 211, 153, 0.08),
+    0 0 24px rgba(52, 211, 153, 0.05),
+    0 1px 0 rgba(255,255,255,0.06) inset, 
+    0 24px 80px rgba(0,0,0,0.45);
+  transition: box-shadow 0.3s ease;
+}
+
+.card-glow-rewards:hover {
+  box-shadow: 
+    0 0 0 1px rgba(52, 211, 153, 0.12),
+    0 0 32px rgba(52, 211, 153, 0.08),
+    0 1px 0 rgba(255,255,255,0.08) inset, 
+    0 24px 80px rgba(0,0,0,0.45);
+}
+
+.card-glow-analytics {
+  box-shadow: 
+    0 0 0 1px rgba(167, 139, 250, 0.08),
+    0 0 24px rgba(167, 139, 250, 0.05),
+    0 1px 0 rgba(255,255,255,0.06) inset, 
+    0 24px 80px rgba(0,0,0,0.45);
+  transition: box-shadow 0.3s ease;
+}
+
+.card-glow-analytics:hover {
+  box-shadow: 
+    0 0 0 1px rgba(167, 139, 250, 0.12),
+    0 0 32px rgba(167, 139, 250, 0.08),
+    0 1px 0 rgba(255,255,255,0.08) inset, 
+    0 24px 80px rgba(0,0,0,0.45);
+}
+
+/* Positive/Negative Value Colors */
+.text-positive {
+  color: hsl(160 60% 55%);
+}
+
+.text-negative {
+  color: hsl(0 70% 60%);
+}
+
+.cinematic-bg {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+  --parallax-x: 0px;
+  --parallax-y: 0px;
+}
+
+.is-scrolling .glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  animation: none !important;
+}
+
+.is-scrolling .glass::before {
+  display: none;
+}
+
+.is-scrolling .animate-gradient-pan,
+.is-scrolling .animate-gradient-shift,
+.is-scrolling .animate-aura-breathe,
+.is-scrolling .animate-hero-glow,
+.is-scrolling .animate-liquid-mesh,
+.is-scrolling .animate-bubble-float-1,
+.is-scrolling .animate-bubble-float-2,
+.is-scrolling .animate-bubble-float-3 {
+  animation-play-state: paused !important;
+}
+
+.animate-liquid-mesh {
+  animation: liquid-mesh 32s ease-in-out infinite;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(2px);
+  transform: translate3d(var(--parallax-x), var(--parallax-y), 0);
+  transition: transform 120ms ease-out;
+}
+
+.bubble-depth-1 {
+  transform: translate3d(
+    calc(var(--parallax-x) * 0.02),
+    calc(var(--parallax-y) * 0.02),
+    0
+  );
+}
+
+.bubble-depth-2 {
+  transform: translate3d(
+    calc(var(--parallax-x) * 0.035),
+    calc(var(--parallax-y) * 0.035),
+    0
+  );
+}
+
+.bubble-depth-3 {
+  transform: translate3d(
+    calc(var(--parallax-x) * 0.05),
+    calc(var(--parallax-y) * 0.05),
+    0
+  );
+}
+
+.bubble-core {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background-size: 140% 140%;
+  will-change: transform, opacity;
+}
+
+.animate-bubble-float-1 {
+  animation: bubble-float-1 26s ease-in-out infinite;
+}
+
+.animate-bubble-float-2 {
+  animation: bubble-float-2 30s ease-in-out infinite;
+}
+
+.animate-bubble-float-3 {
+  animation: bubble-float-3 34s ease-in-out infinite;
+}
+
+@keyframes bubble-float-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate3d(10%, -12%, 0) scale(1.06);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate3d(-8%, 6%, 0) scale(1);
+    opacity: 0.35;
+  }
+}
+
+@keyframes bubble-float-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.28;
+  }
+  50% {
+    transform: translate3d(-12%, 10%, 0) scale(1.08);
+    opacity: 0.48;
+  }
+  100% {
+    transform: translate3d(8%, -9%, 0) scale(1);
+    opacity: 0.28;
+  }
+}
+
+@keyframes bubble-float-3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.22;
+  }
+  50% {
+    transform: translate3d(14%, -10%, 0) scale(1.1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate3d(-10%, 8%, 0) scale(1);
+    opacity: 0.22;
+  }
+}
+
+@keyframes glass-sheen {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes liquid-sheen {
+  0% {
+    transform: translate3d(-6%, -4%, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, 6%, 0) rotate(4deg) scale(1.04);
+  }
+  100% {
+    transform: translate3d(6%, -2%, 0) rotate(-3deg) scale(1);
+  }
+}
+
+@keyframes liquid-mesh {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate3d(-2%, 1%, 0) rotate(5deg) scale(1.03);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate3d(2%, -1%, 0) rotate(-4deg) scale(1);
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass,
+  .glass::before,
+  .animate-liquid-mesh,
+  .animate-bubble-float-1,
+  .animate-bubble-float-2,
+  .animate-bubble-float-3 {
+    animation: none !important;
+  }
+
+  .bubble {
+    transition: none !important;
+  }
+}

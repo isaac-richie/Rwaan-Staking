@@ -1,0 +1,169 @@
+import { motion } from "framer-motion";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { usePositionsWithRewards } from "@/hooks/use-positions";
+import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
+import { useMounted } from "@/hooks/use-mounted";
+import { RWAN_DECIMALS } from "@/lib/utils/constants";
+import { formatBps, formatToken } from "@/lib/utils/format";
+import { AprTier, aprForTVL } from "@/lib/utils/staking";
+
+export function StatsRow({
+  decimals = RWAN_DECIMALS,
+  showData = true,
+}: {
+  decimals?: number;
+  showData?: boolean;
+}) {
+  const mounted = useMounted();
+  const totalStaked = useTotalStaked();
+  const { positions } = usePositionsWithRewards();
+  const lockOptions = useLockOptions();
+  const aprTiers = useAprTiers();
+  const currentApr = useCurrentAprBps();
+
+  const totalRewards = positions.reduce(
+    (sum, position) => sum + position.pendingRewards,
+    0n
+  );
+  const maxMultiplier = lockOptions.options
+    .filter(
+      (option): option is NonNullable<typeof option> => Boolean(option)
+    )
+    .reduce<bigint | null>(
+      (max, option) => {
+        const multiplier = BigInt(option.multiplierBps);
+        return max === null || multiplier > max ? multiplier : max;
+      },
+      null
+    );
+
+  const baseAprBps = (() => {
+    // First try: Use on-chain currentAprBps
+    if (currentApr.data !== undefined && currentApr.data !== null) {
+      const aprValue = BigInt(currentApr.data);
+      if (aprValue > 0n) return aprValue;
+    }
+    
+    // Second try: Calculate from TVL and tiers
+    if (totalStaked.data !== undefined && totalStaked.data !== null) {
+      const tiers = aprTiers.tiers.filter(Boolean) as AprTier[];
+      if (tiers.length > 0) {
+        const calculated = aprForTVL(totalStaked.data, tiers);
+        if (calculated > 0n) return calculated;
+      }
+    }
+    
+    // Fallback: Return the default APR from constants (1600 bps = 16%)
+    return 1600n;
+  })();
+  const maxAprBps =
+    maxMultiplier && baseAprBps > 0n
+      ? (baseAprBps * maxMultiplier) / 10_000n
+      : 0n;
+
+  // Prevent hydration mismatch - show skeleton during SSR
+  if (!mounted) {
+    return (
+      <div className="grid gap-4 md:grid-cols-3">
+      <motion.div
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+      >
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            Total Staked
+          </div>
+          <div className="mt-3 text-2xl font-semibold">
+            <Skeleton className="h-6 w-32" />
+          </div>
+        </motion.div>
+      <motion.div
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+      >
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            Base APR
+          </div>
+          <div className="mt-3 text-2xl font-semibold">
+            <Skeleton className="h-6 w-28" />
+          </div>
+        </motion.div>
+      <motion.div
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+      >
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            {showData ? "Your Claimable" : "Connect Wallet"}
+          </div>
+          <div className="mt-3 text-2xl font-semibold">
+            <Skeleton className="h-6 w-28" />
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
+      <motion.div
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+      >
+        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          Total Staked
+        </div>
+        <div className="mt-3 text-2xl font-semibold">
+          {totalStaked.isLoading ? (
+            <Skeleton className="h-6 w-32" />
+          ) : totalStaked.data !== undefined ? (
+            `${formatToken(totalStaked.data, decimals)} $Rwaan`
+          ) : (
+            "—"
+          )}
+        </div>
+      </motion.div>
+      <motion.div
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+      >
+        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          Base APR
+        </div>
+        <div className="mt-3 text-2xl font-semibold">
+          {currentApr.isLoading || lockOptions.isLoading ? (
+            <Skeleton className="h-6 w-28" />
+          ) : baseAprBps > 0n ? (
+            formatBps(baseAprBps)
+          ) : (
+            "—"
+          )}
+        </div>
+      </motion.div>
+      <motion.div
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+      >
+        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          {showData ? "Your Claimable" : "Connect Wallet"}
+        </div>
+        <div className="mt-3 text-2xl font-semibold">
+          {!showData ? (
+            <span className="text-sm text-muted-foreground">
+              Connect to view your rewards
+            </span>
+          ) : positions.length === 0 ? (
+            <span className="text-muted-foreground">No positions</span>
+          ) : (
+            `${formatToken(totalRewards, decimals)} $Rwaan`
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
