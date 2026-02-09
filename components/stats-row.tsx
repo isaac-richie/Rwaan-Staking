@@ -26,7 +26,7 @@ export function StatsRow({
   const lockOptions = useLockOptions();
   const aprTiers = useAprTiers();
   const currentApr = useCurrentAprBps();
-  const { prices } = useCryptoPrices();
+  const { prices, isLoading: isPricesLoading } = useCryptoPrices();
   const rwanPriceUsd = prices.find((item) => item.symbol === "$Rwaan")?.priceUsd ?? 0;
 
   const totalRewards = positions.reduce(
@@ -131,7 +131,7 @@ export function StatsRow({
           </div>
         </div>
         <div className="mt-3 text-2xl font-semibold">
-          {totalStaked.isLoading ? (
+          {totalStaked.isLoading || isPricesLoading ? (
             <Skeleton className="h-6 w-32" />
           ) : totalStaked.data !== undefined ? (
             <div className="flex flex-col gap-1">

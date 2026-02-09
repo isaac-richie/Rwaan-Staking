@@ -37,33 +37,17 @@ export function TickerItem({
       <span className={cn("text-sm font-semibold", highlight && "text-primary")}>
         {token.symbol}
       </span>
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span
-          key={price?.priceUsd ?? "0"}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.18 }}
-          className="min-w-[88px] text-right text-sm text-foreground tabular-nums"
-        >
-          ${formatPrice(price?.priceUsd ?? 0)}
-        </motion.span>
-      </AnimatePresence>
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span
-          key={change}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.18 }}
-          className={cn(
-            "min-w-[72px] text-right text-xs font-medium tabular-nums",
-            isPositive ? "text-emerald-300" : "text-rose-300"
-          )}
-        >
-          {isPositive ? "▲" : "▼"} {formatChange(change)}
-        </motion.span>
-      </AnimatePresence>
+      <span className="min-w-[88px] text-right text-sm text-foreground tabular-nums">
+        ${formatPrice(price?.priceUsd ?? 0)}
+      </span>
+      <span
+        className={cn(
+          "min-w-[72px] text-right text-xs font-medium tabular-nums",
+          isPositive ? "text-emerald-300" : "text-rose-300"
+        )}
+      >
+        {isPositive ? "▲" : "▼"} {formatChange(change)}
+      </span>
     </motion.div>
   );
 }

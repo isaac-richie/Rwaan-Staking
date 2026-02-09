@@ -12,18 +12,8 @@ import { useMounted } from "@/hooks/use-mounted";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { RWAN_DECIMALS, RWAN_TOKEN_ADDRESS } from "@/lib/utils/constants";
 import { formatToken, formatUsd } from "@/lib/utils/format";
-import dynamic from "next/dynamic";
 import { useRwanMarket } from "@/components/crypto/use-rwan-market";
 
-const WalletButton = dynamic(
-  () => import("@/components/wallet-button").then((mod) => mod.WalletButton),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-10 w-28 rounded-full border border-white/10 bg-white/5" />
-    ),
-  }
-);
 
 export function Hero() {
   const { address } = useAccount();
@@ -64,7 +54,8 @@ export function Hero() {
               show: {
                 opacity: 1,
                 transition: {
-                  staggerChildren: 0.2
+                  staggerChildren: 0.1,
+                  delayChildren: 0.2,
                 }
               }
             }}
@@ -72,8 +63,8 @@ export function Hero() {
           >
             <motion.span
               variants={{
-                hidden: { opacity: 0, y: 20 },
-                show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
+                hidden: { opacity: 0, y: 8 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
               }}
               className="block text-white"
             >
@@ -81,8 +72,8 @@ export function Hero() {
             </motion.span>
             <motion.span
               variants={{
-                hidden: { opacity: 0, y: 20 },
-                show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
+                hidden: { opacity: 0, y: 8 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
               }}
               className="text-gold-gradient block"
             >
@@ -111,13 +102,13 @@ export function Hero() {
               <a href="#stake-rwan">Stake Now</a>
             </Button>
 
-            <div className="col-span-2 w-full sm:w-auto">
-              {mounted ? (
-                <WalletButton />
-              ) : (
-                <div className="h-12 w-full rounded-full border border-white/10 bg-white/5" />
-              )}
-            </div>
+            <Button
+              asChild
+              variant="secondary"
+              className="col-span-2 w-full sm:w-auto h-12 text-sm font-medium border-white/10 bg-white/5 hover:bg-white/10 hover:text-white"
+            >
+              <a href="#plans">View Plans</a>
+            </Button>
 
             <Button
               variant="secondary"

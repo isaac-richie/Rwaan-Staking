@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 
 import { Hero } from "@/components/hero";
 import { AdminPanel } from "@/components/admin/AdminPanel";
-import { PerpdexModal } from "@/components/modals/perpdex-modal";
+
 import { PositionsTable } from "@/components/positions-table";
 import { ReferralSummary } from "@/components/referrals/referral-summary";
 import { Section } from "@/components/section";
@@ -20,7 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMounted } from "@/hooks/use-mounted";
 
 export function Dashboard() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const mounted = useMounted();
   const { address } = useAccount();
   const plansRef = useRef<HTMLDivElement | null>(null);
@@ -41,7 +41,7 @@ export function Dashboard() {
         title="Staking plans"
         description="Compare fixed-term plans with clear APR and withdrawal rules."
       >
-        <div ref={plansRef}>
+        <div id="plans" ref={plansRef} className="scroll-mt-28">
           <PlanCards />
         </div>
       </Section>
@@ -97,20 +97,12 @@ export function Dashboard() {
                 Wallet required to view your dashboard.
               </div>
             )}
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                onClick={() => setIsModalOpen(true)}
-                className="h-12 px-6 text-sm font-semibold tracking-wide shadow-[0_0_20px_rgba(250,204,21,0.2)] transition-all duration-200 ease-soft-spring hover:-translate-y-0.5 hover:brightness-110"
-              >
-                Join Perpdex
-              </Button>
-            </div>
           </>
         )}
       </Section>
       {/* Admin Panel - only shows if user is owner */}
       {mounted && <AdminPanel forceShow={forceAdminPreview} />}
-      <PerpdexModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils/cn";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +16,9 @@ export function CryptoTicker({
   compact?: boolean;
 }) {
   const { tokens, prices, isLoading, error } = useCryptoPrices();
+
+  // Memoize the duplicated list to prevent re-renders when prices change
+  const tickerItems = useMemo(() => [...tokens, ...tokens], [tokens]);
 
   return (
     <div
@@ -50,9 +54,10 @@ export function CryptoTicker({
             <motion.div
               className="flex w-max gap-3"
               animate={{ x: ["0%", "-50%"] }}
-              transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+              transition={{ duration: 40, ease: "linear", repeat: Infinity }}
+              whileHover={{ animationPlayState: "paused" }}
             >
-              {[...tokens, ...tokens].map((token, index) => (
+              {tickerItems.map((token, index) => (
                 <TickerItem
                   key={`${token.symbol}-${index}`}
                   token={token}

@@ -27,7 +27,11 @@ export const metadata: Metadata = {
   title: "$Rwaan Staking",
   description: "Stake $Rwaan on BNB Smart Chain with flexible and locked options.",
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/favicon-64.png", sizes: "64x64", type: "image/png" },
+    ],
+    apple: "/favicon.png",
   },
 };
 
