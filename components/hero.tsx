@@ -56,10 +56,39 @@ export function Hero() {
             </span>
           </div>
 
-          <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
-            <span className="block text-white">Stake $Rwaan.</span>
-            <span className="text-gold-gradient block">Earn premium yield.</span>
-          </h1>
+          <motion.h1
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.2
+                }
+              }
+            }}
+            className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl"
+          >
+            <motion.span
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
+              }}
+              className="block text-white"
+            >
+              Stake $Rwaan.
+            </motion.span>
+            <motion.span
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
+              }}
+              className="text-gold-gradient block"
+            >
+              Earn premium yield.
+            </motion.span>
+          </motion.h1>
 
           <AnimatePresence initial={false}>
             {showDetails ? (
