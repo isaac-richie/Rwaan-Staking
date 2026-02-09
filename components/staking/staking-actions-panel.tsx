@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
+import confetti from "canvas-confetti";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,7 +91,7 @@ export function StakingActionsPanel() {
       const aprValue = BigInt(currentApr.data);
       if (aprValue > 0n) return aprValue;
     }
-    
+
     // Second try: Calculate from TVL and tiers
     if (totalStaked.data !== undefined && totalStaked.data !== null) {
       const tiers = aprTiers.tiers.filter(Boolean) as AprTier[];
@@ -99,7 +100,7 @@ export function StakingActionsPanel() {
         if (calculated > 0n) return calculated;
       }
     }
-    
+
     // Fallback: Return the default APR from constants (1600 bps = 16%)
     return 1600n;
   }, [currentApr.data, totalStaked.data, aprTiers.tiers]);
@@ -152,11 +153,11 @@ export function StakingActionsPanel() {
     if (!parsedAmount || !selectedOption) return;
     const hash = await stakeLocked(parsedAmount, selectedOption.id, referrer ?? undefined);
     if (!hash) return;
-    
+
     // Format the staked amount for notification
     const formattedAmount = formatToken(parsedAmount, decimals);
     const planLabel = STAKING_PLANS.find(p => BigInt(p.durationSeconds) === selectedOption.duration)?.label || "locked";
-    
+
     trackTx(hash, {
       title: "Stake $Rwaan",
       successMessage: "Locked position created.",
@@ -164,6 +165,13 @@ export function StakingActionsPanel() {
       retry: handleStakeLocked,
       action: "Staked",
       amount: `${formattedAmount} $Rwaan (${planLabel})`,
+    });
+    // Trigger confetti celebration
+    confetti({
+      particleCount: isMobile ? 40 : 100,
+      spread: isMobile ? 40 : 70,
+      origin: { y: 0.6 },
+      colors: ["#F3BA2F", "#ffffff"],
     });
     setAmount("");
   };
@@ -181,10 +189,10 @@ export function StakingActionsPanel() {
     if (!parsedAmount) return;
     const hash = await stakeFlexible(parsedAmount, referrer ?? undefined);
     if (!hash) return;
-    
+
     // Format the staked amount for notification
     const formattedAmount = formatToken(parsedAmount, decimals);
-    
+
     trackTx(hash, {
       title: "Stake $Rwaan",
       successMessage: "Flexible position created.",
@@ -192,6 +200,13 @@ export function StakingActionsPanel() {
       retry: handleStakeFlexible,
       action: "Staked",
       amount: `${formattedAmount} $Rwaan (Flexible)`,
+    });
+    // Trigger confetti celebration
+    confetti({
+      particleCount: isMobile ? 40 : 100,
+      spread: isMobile ? 40 : 70,
+      origin: { y: 0.6 },
+      colors: ["#F3BA2F", "#ffffff"],
     });
     setAmount("");
   };
@@ -250,50 +265,50 @@ export function StakingActionsPanel() {
                           ? (baseAprBps * multiplierBps) / 10_000n
                           : 0n;
                       return (
-                    <motion.button
-                      key={plan.id}
-                      type="button"
-                      whileHover={isMobile ? undefined : { y: -3 }}
-                      whileTap={isMobile ? undefined : { scale: 0.98 }}
-                      transition={isMobile ? undefined : { duration: 0.18 }}
-                      onClick={() => setSelectedPlanId(plan.id)}
-                      className={cn(
-                        "relative glass rounded-2xl border px-4 py-3 text-left transition-all duration-200 sm:px-5 sm:py-4",
-                        selectedPlanId === plan.id
-                          ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(250,204,21,0.3)] ring-2 ring-primary/30"
-                          : "border-white/10 hover:border-white/20 hover:bg-white/5"
-                      )}
-                    >
-                      {/* Selected Indicator */}
-                      {selectedPlanId === plan.id && (
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-black"
+                        <motion.button
+                          key={plan.id}
+                          type="button"
+                          whileHover={isMobile ? undefined : { y: -3 }}
+                          whileTap={isMobile ? undefined : { scale: 0.98 }}
+                          transition={isMobile ? undefined : { duration: 0.18 }}
+                          onClick={() => setSelectedPlanId(plan.id)}
+                          className={cn(
+                            "relative glass rounded-2xl border px-4 py-3 text-left transition-all duration-200 sm:px-5 sm:py-4",
+                            selectedPlanId === plan.id
+                              ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(250,204,21,0.3)] ring-2 ring-primary/30"
+                              : "border-white/10 hover:border-white/20 hover:bg-white/5"
+                          )}
                         >
-                          ✓
-                        </motion.div>
-                      )}
-                      
-                      <div className={cn(
-                        "text-xs uppercase tracking-[0.3em]",
-                        selectedPlanId === plan.id ? "text-primary" : "text-muted-foreground"
-                      )}>
-                        Plan
-                      </div>
-                      <div className={cn(
-                        "mt-2 text-base font-semibold sm:text-lg",
-                        selectedPlanId === plan.id ? "text-primary" : "text-foreground"
-                      )}>
-                        {plan.label}
-                      </div>
-                      <div className={cn(
-                        "mt-1 text-sm",
-                        selectedPlanId === plan.id ? "text-primary/80" : "text-muted-foreground"
-                      )}>
-                        {effectiveAprBps ? `${formatBps(effectiveAprBps)} APR` : "APR —"}
-                      </div>
-                    </motion.button>
+                          {/* Selected Indicator */}
+                          {selectedPlanId === plan.id && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-black"
+                            >
+                              ✓
+                            </motion.div>
+                          )}
+
+                          <div className={cn(
+                            "text-xs uppercase tracking-[0.3em]",
+                            selectedPlanId === plan.id ? "text-primary" : "text-muted-foreground"
+                          )}>
+                            Plan
+                          </div>
+                          <div className={cn(
+                            "mt-2 text-base font-semibold sm:text-lg",
+                            selectedPlanId === plan.id ? "text-primary" : "text-foreground"
+                          )}>
+                            {plan.label}
+                          </div>
+                          <div className={cn(
+                            "mt-1 text-sm",
+                            selectedPlanId === plan.id ? "text-primary/80" : "text-muted-foreground"
+                          )}>
+                            {effectiveAprBps ? `${formatBps(effectiveAprBps)} APR` : "APR —"}
+                          </div>
+                        </motion.button>
                       );
                     })()
                   ))}
@@ -366,14 +381,16 @@ export function StakingActionsPanel() {
                   {/* Capital Button with Halo */}
                   <div className="relative inline-flex">
                     {/* Diffused Halo (behind button) */}
-                    <div 
-                      className="absolute inset-0 -z-10 rounded-xl bg-gradient-radial from-[#FACC15]/30 via-[#FACC15]/10 to-transparent blur-2xl animate-halo-expand group-hover:animate-none"
-                      style={{ 
-                        transform: 'scale(1.8)',
-                        filter: 'blur(40px)',
-                      }}
-                    />
-                    
+                    {!isMobile && (
+                      <div
+                        className="absolute inset-0 -z-10 rounded-xl bg-gradient-radial from-[#FACC15]/30 via-[#FACC15]/10 to-transparent blur-2xl animate-halo-expand group-hover:animate-none"
+                        style={{
+                          transform: 'scale(1.8)',
+                          filter: 'blur(40px)',
+                        }}
+                      />
+                    )}
+
                     <Button
                       disabled={
                         disabled ||

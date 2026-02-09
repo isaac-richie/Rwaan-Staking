@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
+import confetti from "canvas-confetti";
 
 import { EmptyState } from "@/components/empty-state";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,9 @@ import { useTransactionToasts } from "@/hooks/use-transaction-toasts";
 import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
 import { useClaimPosition, useWithdrawPosition } from "@/hooks/use-staking-writes";
 import { useWithdrawEarly, useEarlyWithdrawalPenalty } from "@/hooks/use-early-withdrawal";
+
 import { useMounted } from "@/hooks/use-mounted";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { RWAN_DECIMALS, STAKING_PLANS } from "@/lib/utils/constants";
 import { formatBps, formatDateFromSeconds, formatToken, formatUsd } from "@/lib/utils/format";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
@@ -23,6 +26,7 @@ import { useCryptoPrices } from "@/components/crypto/use-crypto-prices";
 
 export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number }) {
   const mounted = useMounted();
+  const isMobile = useIsMobile();
   const { address } = useAccount();
   const { positions, isLoading } = usePositionsWithRewards();
   const { claim, isPending: isClaimPending } = useClaimPosition();
@@ -89,6 +93,14 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
       action: "Claimed",
       amount: `${rewardAmount} $Rwaan`,
     });
+    // Trigger confetti celebration
+    confetti({
+      particleCount: isMobile ? 40 : 80,
+      spread: isMobile ? 40 : 60,
+      origin: { y: 0.6 },
+      colors: ["#F3BA2F", "#10B981"], // Gold and Emerald
+    });
+
     // Clear pending state after transaction is submitted
     setPendingClaimId(null);
   };
@@ -196,12 +208,12 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
   }
 
   return (
-    <div className="glass glass-solid interactive-card rounded-2xl p-4 md:p-6">
+    <div className="sleek-card interactive-card p-4 md:p-6 border border-white/5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
           <div className="text-sm font-semibold">Your positions</div>
-          <div className="text-xs text-muted-foreground">
-            Total accrued interest: {formatToken(totalPending, decimals)} $Rwaan
+          <div className="text-xs text-[#F3BA2F]/80 font-medium tracking-wide">
+            Total accrued interest: <span className="text-white">{formatToken(totalPending, decimals)} $Rwaan</span>
           </div>
         </div>
         <Badge variant="accent">{positions.length} positions</Badge>
@@ -209,13 +221,13 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
       <Table className="min-w-[720px]">
         <TableHeader>
           <TableRow>
-            <TableHead>Amount</TableHead>
-            <TableHead>Plan</TableHead>
-            <TableHead>APR</TableHead>
-            <TableHead>Start Date</TableHead>
-            <TableHead>Unlock Date</TableHead>
-            <TableHead>Accrued Interest</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Amount</TableHead>
+            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Plan</TableHead>
+            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">APR</TableHead>
+            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Start Date</TableHead>
+            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Unlock Date</TableHead>
+            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Accrued Interest</TableHead>
+            <TableHead className="text-right text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -320,7 +332,7 @@ function PositionRow({
 
   return (
     <>
-      <TableRow className="border-b border-white/5 animate-fade-in">
+      <TableRow className="border-b border-white/5 animate-fade-in hover:bg-white/[0.02] transition-colors data-[state=selected]:bg-white/[0.02]">
         <TableCell>
           <div className="flex flex-col">
             <span>{formatToken(position.amount, decimals)} $Rwaan</span>

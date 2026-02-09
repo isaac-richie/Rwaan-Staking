@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
 import { useMounted } from "@/hooks/use-mounted";
@@ -65,8 +66,12 @@ export function PlanCards() {
               whileHover={isMobile ? undefined : cardHover}
               whileTap={{ scale: 0.98 }}
               transition={isMobile ? undefined : { duration: 0.2 }}
-              className={cn("sleek-card interactive-card p-6 sm:p-7", getCardGlow('staking'))}
+              className={cn("sleek-card interactive-card p-6 sm:p-7 relative", getCardGlow('staking'))}
             >
+              {/* Add Border Beam to the 12-month (Best Value) plan */}
+              {plan.durationSeconds === 31536000 && (
+                <BorderBeam size={250} duration={12} delay={9} borderWidth={1.5} colorFrom="#F3BA2F" colorTo="#F3BA2F" />
+              )}
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
