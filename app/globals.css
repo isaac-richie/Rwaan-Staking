@@ -492,4 +492,48 @@ h3 {
   .cinematic-bg {
     background: #0a0e1a;
   }
+
+  .mobile-hero-glow {
+    position: relative;
+  }
+
+  .mobile-hero-glow::before {
+    content: "";
+    position: absolute;
+    inset: -10%;
+    background: radial-gradient(
+      circle at 20% 10%,
+      rgba(243, 186, 47, 0.18),
+      transparent 60%
+    );
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .mobile-section-sep {
+    position: relative;
+  }
+
+  .mobile-section-sep::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -16px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(243, 186, 47, 0.25),
+      transparent
+    );
+  }
+
+  .mobile-tap {
+    transition: transform 0.12s ease;
+  }
+
+  .mobile-tap:active {
+    transform: scale(0.985);
+  }
 }

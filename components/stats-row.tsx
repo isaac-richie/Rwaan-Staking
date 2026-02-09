@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatUnits } from "viem";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePositionsWithRewards } from "@/hooks/use-positions";
@@ -6,8 +7,9 @@ import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@
 import { useMounted } from "@/hooks/use-mounted";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { RWAN_DECIMALS } from "@/lib/utils/constants";
-import { formatBps, formatToken } from "@/lib/utils/format";
+import { formatBps, formatToken, formatUsd } from "@/lib/utils/format";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
+import { useCryptoPrices } from "@/components/crypto/use-crypto-prices";
 
 export function StatsRow({
   decimals = RWAN_DECIMALS,
@@ -23,6 +25,8 @@ export function StatsRow({
   const lockOptions = useLockOptions();
   const aprTiers = useAprTiers();
   const currentApr = useCurrentAprBps();
+  const { prices } = useCryptoPrices();
+  const rwanPriceUsd = prices.find((item) => item.symbol === "$Rwaan")?.priceUsd ?? 0;
 
   const totalRewards = positions.reduce(
     (sum, position) => sum + position.pendingRewards,
@@ -63,6 +67,10 @@ export function StatsRow({
     maxMultiplier && baseAprBps > 0n
       ? (baseAprBps * maxMultiplier) / 10_000n
       : 0n;
+  const totalStakedUsd =
+    totalStaked.data !== undefined && rwanPriceUsd > 0
+      ? Number(formatUnits(totalStaked.data, decimals)) * rwanPriceUsd
+      : null;
 
   // Prevent hydration mismatch - show skeleton during SSR
   if (!mounted) {
@@ -122,7 +130,12 @@ export function StatsRow({
           {totalStaked.isLoading ? (
             <Skeleton className="h-6 w-32" />
           ) : totalStaked.data !== undefined ? (
-            `${formatToken(totalStaked.data, decimals)} $Rwaan`
+            <div className="flex flex-col gap-1">
+              <span>{formatUsd(totalStakedUsd ?? undefined, 0)}</span>
+              <span className="text-sm text-muted-foreground">
+                {formatToken(totalStaked.data, decimals)} $Rwaan
+              </span>
+            </div>
           ) : (
             "—"
           )}

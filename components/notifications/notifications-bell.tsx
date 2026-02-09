@@ -66,7 +66,7 @@ export function NotificationsBell() {
       </Button>
 
       {open ? (
-        <div className="absolute right-0 z-50 mt-3 w-80 overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
+        <div className="absolute right-0 z-50 mt-3 w-80 max-w-[calc(100vw-24px)] sm:max-w-[360px] overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.55)] sm:right-0 sm:left-auto sm:translate-x-0 left-1/2 -translate-x-1/2">
           <div className="absolute inset-0 bg-[#0b1220]" />
           <div className="relative">
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">

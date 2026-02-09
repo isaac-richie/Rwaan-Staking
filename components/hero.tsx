@@ -43,7 +43,7 @@ export function Hero() {
       initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={isMobile ? { duration: 0 } : { duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="glass glass-solid relative overflow-hidden rounded-2xl p-6 sm:rounded-[28px] sm:p-8 md:p-14"
+      className="glass glass-solid mobile-hero-glow relative overflow-hidden rounded-2xl p-6 sm:rounded-[28px] sm:p-8 md:p-14"
     >
       <div className="pointer-events-none absolute -inset-10 -z-10 rounded-[32px] bg-[#F3BA2F]/25 blur-[140px] animate-hero-glow" />
       <div className="absolute inset-0 bg-radial-glow opacity-80" />
