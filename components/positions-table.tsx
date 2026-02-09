@@ -35,7 +35,7 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
   const currentApr = useCurrentAprBps();
   const { prices } = useCryptoPrices();
   const rwanPriceUsd = prices.find((item) => item.symbol === "$Rwaan")?.priceUsd ?? 0;
-  
+
   // Track which specific position is being claimed/withdrawn
   const [pendingClaimId, setPendingClaimId] = useState<bigint | null>(null);
   const [pendingWithdrawId, setPendingWithdrawId] = useState<bigint | null>(null);
@@ -69,18 +69,18 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
       console.error("[PositionsTable] Cannot claim without connected wallet");
       return;
     }
-    
+
     setPendingClaimId(positionId);
     const hash = await claim(positionId);
     if (!hash) {
       setPendingClaimId(null);
       return;
     }
-    
+
     // Find position to get reward amount
     const position = positions.find(p => p.id === positionId);
     const rewardAmount = position ? formatToken(position.pendingRewards, decimals) : "0";
-    
+
     trackTx(hash, {
       title: "Claim rewards",
       successMessage: "Rewards claimed.",
@@ -99,18 +99,18 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
       console.error("[PositionsTable] Cannot withdraw without connected wallet");
       return;
     }
-    
+
     setPendingWithdrawId(positionId);
     const hash = await withdraw(positionId);
     if (!hash) {
       setPendingWithdrawId(null);
       return;
     }
-    
+
     // Find position to get staked amount
     const position = positions.find(p => p.id === positionId);
     const stakedAmount = position ? formatToken(position.amount, decimals) : "0";
-    
+
     trackTx(hash, {
       title: "Withdraw position",
       successMessage: "Position withdrawn.",
@@ -130,23 +130,23 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
 
   const handleConfirmEarlyWithdraw = async () => {
     if (!selectedPositionForEarlyWithdraw || !address) return;
-    
+
     setEarlyWithdrawModalOpen(false);
     setPendingWithdrawId(selectedPositionForEarlyWithdraw);
-    
+
     try {
       const result = await withdrawEarly?.({ args: [selectedPositionForEarlyWithdraw] });
       const hash = result?.hash;
-      
+
       if (!hash) {
         setPendingWithdrawId(null);
         setSelectedPositionForEarlyWithdraw(null);
         return;
       }
-      
+
       const position = positions.find(p => p.id === selectedPositionForEarlyWithdraw);
       const stakedAmount = position ? formatToken(position.amount, decimals) : "0";
-      
+
       trackTx(hash, {
         title: "Early withdrawal",
         successMessage: "Position withdrawn (35% penalty applied).",
@@ -221,40 +221,40 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
         <TableBody>
           {isLoading
             ? Array.from({ length: 3 }).map((_, index) => (
-                <TableRow key={`skeleton-${index}`}>
-                  <TableCell colSpan={7}>
-                    <Skeleton className="h-10 w-full" />
-                  </TableCell>
-                </TableRow>
-              ))
+              <TableRow key={`skeleton-${index}`}>
+                <TableCell colSpan={7}>
+                  <Skeleton className="h-10 w-full" />
+                </TableCell>
+              </TableRow>
+            ))
             : positions.map((position) => (
-                <PositionRow
-                  key={position.id.toString()}
-                  position={position}
-                  decimals={decimals}
-                  onClaim={handleClaim}
-                  onWithdraw={handleWithdraw}
-                  onEarlyWithdraw={handleRequestEarlyWithdraw}
-                  isClaimPending={pendingClaimId === position.id}
-                  isWithdrawPending={pendingWithdrawId === position.id}
-                  baseAprBps={baseAprBps}
-                  lockOption={lockOptionsMap.get(position.lockId)}
-                  walletConnected={Boolean(address)}
-                  priceUsd={rwanPriceUsd}
-                />
-              ))}
+              <PositionRow
+                key={position.id.toString()}
+                position={position}
+                decimals={decimals}
+                onClaim={handleClaim}
+                onWithdraw={handleWithdraw}
+                onEarlyWithdraw={handleRequestEarlyWithdraw}
+                isClaimPending={pendingClaimId === position.id}
+                isWithdrawPending={pendingWithdrawId === position.id}
+                baseAprBps={baseAprBps}
+                lockOption={lockOptionsMap.get(position.lockId)}
+                walletConnected={Boolean(address)}
+                priceUsd={rwanPriceUsd}
+              />
+            ))}
         </TableBody>
       </Table>
-      
+
       {/* Early Withdrawal Modal */}
       <EarlyWithdrawModal
         open={earlyWithdrawModalOpen}
         penaltyAmount={
           selectedPositionForEarlyWithdraw
             ? formatToken(
-                (positions.find(p => p.id === selectedPositionForEarlyWithdraw)?.amount ?? 0n) * 35n / 100n,
-                decimals
-              )
+              (positions.find(p => p.id === selectedPositionForEarlyWithdraw)?.amount ?? 0n) * 35n / 100n,
+              decimals
+            )
             : "0"
         }
         onConfirm={handleConfirmEarlyWithdraw}
@@ -305,8 +305,8 @@ function PositionRow({
   const { remaining, isUnlocked } = useCountdown(unlockAt);
   const plan = lockOption
     ? STAKING_PLANS.find(
-        (item) => BigInt(item.durationSeconds) === lockOption.duration
-      )
+      (item) => BigInt(item.durationSeconds) === lockOption.duration
+    )
     : undefined;
 
   const multiplierBps =
@@ -327,8 +327,8 @@ function PositionRow({
             <span className="text-xs text-muted-foreground">
               {priceUsd > 0
                 ? `≈ ${formatUsd(
-                    Number(formatUnits(position.amount, decimals)) * priceUsd
-                  )}`
+                  Number(formatUnits(position.amount, decimals)) * priceUsd
+                )}`
                 : "—"}
             </span>
           </div>
@@ -349,8 +349,8 @@ function PositionRow({
                   {isUnlocked
                     ? "Position unlocked."
                     : `${Math.floor(remaining / 86400)}d ${Math.floor(
-                        (remaining % 86400) / 3600
-                      )}h remaining`}
+                      (remaining % 86400) / 3600
+                    )}h remaining`}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -373,6 +373,7 @@ function PositionRow({
                 <Button
                   size="sm"
                   variant="secondary"
+                  className={isClaimable && !isClaimPending ? "claim-pulse" : ""}
                   disabled={!isClaimable || isClaimPending}
                   onClick={() => onClaim(position.id)}
                 >

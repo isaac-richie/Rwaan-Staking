@@ -48,13 +48,19 @@ export function Hero() {
       <div className="pointer-events-none absolute -inset-10 -z-10 rounded-[32px] bg-[#F3BA2F]/25 blur-[140px] animate-hero-glow" />
       <div className="absolute inset-0 bg-radial-glow opacity-80" />
       <div className="relative z-10 flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-        <div className="flex max-w-xl flex-col gap-4">
-          <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            $Rwaan Staking Protocol
+        <div className="flex max-w-xl flex-col gap-6">
+          <div className="flex items-center gap-2">
+            <span className="flex h-1.5 w-1.5 rounded-full bg-[#F3BA2F] shadow-[0_0_8px_rgba(243,186,47,0.8)]"></span>
+            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#F3BA2F]/90">
+              Rwaan Staking Protocol
+            </span>
           </div>
-          <h1 className="text-2xl font-semibold leading-tight sm:text-3xl md:text-4xl">
-            Stake $Rwaan. Earn yield. Stay liquid.
+
+          <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+            <span className="block text-white">Stake $Rwaan.</span>
+            <span className="text-gold-gradient block">Earn premium yield.</span>
           </h1>
+
           <AnimatePresence initial={false}>
             {showDetails ? (
               <motion.p
@@ -62,7 +68,7 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={isMobile ? undefined : { opacity: 0, y: -8 }}
                 transition={isMobile ? { duration: 0 } : { duration: 0.2 }}
-                className="text-sm text-muted-foreground md:text-base"
+                className="text-sm leading-relaxed text-muted-foreground md:text-base"
               >
                 Stake with confidence. Track every position, claim rewards
                 precisely, and unlock at your own pace, built for long-term
@@ -70,38 +76,35 @@ export function Hero() {
               </motion.p>
             ) : null}
           </AnimatePresence>
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-            <Button asChild className="w-full sm:w-auto">
-              <a href="#stake-rwan">Stake $Rwaan</a>
+
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center">
+            <Button asChild className="col-span-2 w-full shadow-[0_0_20px_rgba(243,186,47,0.2)] sm:w-auto mobile-tap press-effect font-semibold text-base py-6">
+              <a href="#stake-rwan">Stake Now</a>
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setShowDetails((prev) => !prev)}
-              className="w-full sm:w-auto"
-            >
-              {showDetails ? "Hide details" : "How it works"}
-            </Button>
-            <div className="w-full sm:w-auto">
+
+            <div className="col-span-2 w-full sm:w-auto">
               {mounted ? (
                 <WalletButton />
               ) : (
-                <div className="h-10 w-28 rounded-full border border-white/10 bg-white/5" />
+                <div className="h-12 w-full rounded-full border border-white/10 bg-white/5" />
               )}
             </div>
+
             <Button
-              variant="ghost"
+              variant="secondary"
               onClick={() => {
                 navigator.clipboard.writeText(RWAN_TOKEN_ADDRESS);
                 toast({
-                  title: "Contract address copied",
-                  description: RWAN_TOKEN_ADDRESS,
+                  title: "Address copied",
+                  description: "Contract address copied to clipboard",
                 });
               }}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto text-xs h-10 border-white/5 bg-white/5 hover:bg-white/10"
             >
-              Contract address
+              Copy Address
             </Button>
-            <Button asChild variant="outline" className="w-full sm:w-auto">
+
+            <Button asChild variant="secondary" className="w-full sm:w-auto text-xs h-10 border-white/5 bg-white/5 hover:bg-white/10">
               <a
                 href={`https://pancakeswap.finance/swap?outputCurrency=${RWAN_TOKEN_ADDRESS}`}
                 target="_blank"

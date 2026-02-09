@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTokenAllowance, useTokenBalance, useTokenMetadata, useApproveToken } from "@/hooks/use-erc20";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useReferral } from "@/hooks/use-referral";
 import { useTransactionToasts } from "@/hooks/use-transaction-toasts";
 import { useLockOptions, useStakingToken } from "@/hooks/use-staking-reads";
@@ -19,6 +20,7 @@ import { formatDuration, formatMultiplier, formatToken } from "@/lib/utils/forma
 
 export function StakePanel() {
   const { address } = useAccount();
+  const isMobile = useIsMobile();
   const tokenAddress = useStakingToken();
   const tokenMeta = useTokenMetadata(tokenAddress.data as `0x${string}` | undefined);
   const decimals = tokenMeta.decimals ?? RWAN_DECIMALS;
@@ -119,9 +121,9 @@ export function StakePanel() {
               </TabsList>
               <TabsContent value="flexible">
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={isMobile ? { duration: 0 } : { duration: 0.2 }}
                   className="space-y-4"
                 >
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -155,9 +157,9 @@ export function StakePanel() {
               </TabsContent>
               <TabsContent value="locked">
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={isMobile ? { duration: 0 } : { duration: 0.2 }}
                   className="space-y-4"
                 >
                   <div className="flex items-center justify-between text-xs text-muted-foreground">

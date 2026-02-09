@@ -537,3 +537,71 @@ h3 {
     transform: scale(0.985);
   }
 }
+
+/* ============================================
+   Mobile-Safe Animations (GPU Accelerated)
+   Works on both mobile and desktop
+   ============================================ */
+
+/* Press effect - universal tap/click feedback */
+.press-effect {
+  transition: transform 0.1s ease;
+}
+.press-effect:active {
+  transform: scale(0.97);
+}
+
+/* Claim pulse - draws attention when rewards available */
+@keyframes claim-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(52, 211, 153, 0);
+  }
+}
+.claim-pulse {
+  animation: claim-pulse 2s ease-in-out infinite;
+}
+
+/* Success flash - brief green highlight after TX */
+@keyframes success-flash {
+  0% {
+    background-color: rgba(52, 211, 153, 0.25);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+.success-flash {
+  animation: success-flash 0.6s ease-out forwards;
+}
+
+/* Subtle card hover lift - desktop only via JS */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Shimmer effect for loading/highlight states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}

@@ -50,7 +50,7 @@ export function StatsRow({
       const aprValue = BigInt(currentApr.data);
       if (aprValue > 0n) return aprValue;
     }
-    
+
     // Second try: Calculate from TVL and tiers
     if (totalStaked.data !== undefined && totalStaked.data !== null) {
       const tiers = aprTiers.tiers.filter(Boolean) as AprTier[];
@@ -59,7 +59,7 @@ export function StatsRow({
         if (calculated > 0n) return calculated;
       }
     }
-    
+
     // Fallback: Return the default APR from constants (1600 bps = 16%)
     return 1600n;
   })();
@@ -121,10 +121,13 @@ export function StatsRow({
       <motion.div
         whileHover={isMobile ? undefined : { y: -4 }}
         transition={isMobile ? undefined : { duration: 0.2 }}
-        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+        className="sleek-card interactive-card p-5 sm:p-6"
       >
-        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Total Staked
+        <div className="flex items-center gap-2 mb-2">
+          <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+            Total Staked
+          </div>
         </div>
         <div className="mt-3 text-2xl font-semibold">
           {totalStaked.isLoading ? (
@@ -144,10 +147,13 @@ export function StatsRow({
       <motion.div
         whileHover={isMobile ? undefined : { y: -4 }}
         transition={isMobile ? undefined : { duration: 0.2 }}
-        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+        className="sleek-card interactive-card p-5 sm:p-6"
       >
-        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Base APR
+        <div className="flex items-center gap-2 mb-2">
+          <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+            Base APR
+          </div>
         </div>
         <div className="mt-3 text-2xl font-semibold">
           {currentApr.isLoading || lockOptions.isLoading ? (
@@ -162,10 +168,13 @@ export function StatsRow({
       <motion.div
         whileHover={isMobile ? undefined : { y: -4 }}
         transition={isMobile ? undefined : { duration: 0.2 }}
-        className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
+        className="sleek-card interactive-card p-5 sm:p-6"
       >
-        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          {showData ? "Your Claimable" : "Connect Wallet"}
+        <div className="flex items-center gap-2 mb-2">
+          <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+            {showData ? "Your Claimable" : "Connect Wallet"}
+          </div>
         </div>
         <div className="mt-3 text-2xl font-semibold">
           {!showData ? (
