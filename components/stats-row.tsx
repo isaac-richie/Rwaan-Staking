@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { formatUnits } from "viem";
 
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePositionsWithRewards } from "@/hooks/use-positions";
 import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
@@ -134,9 +135,13 @@ export function StatsRow({
             <Skeleton className="h-6 w-32" />
           ) : totalStaked.data !== undefined ? (
             <div className="flex flex-col gap-1">
-              <span>{formatUsd(totalStakedUsd ?? undefined, 0)}</span>
-              <span className="text-sm text-muted-foreground">
-                {formatToken(totalStaked.data, decimals)} $Rwaan
+              <div className="flex flex-row items-baseline gap-0.5">
+                <span>$</span>
+                <NumberTicker value={totalStakedUsd ?? 0} decimalPlaces={0} className="text-white" />
+              </div>
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <NumberTicker value={Number(formatUnits(totalStaked.data, decimals))} decimalPlaces={2} className="text-muted-foreground" />
+                <span>$Rwaan</span>
               </span>
             </div>
           ) : (
@@ -159,7 +164,10 @@ export function StatsRow({
           {currentApr.isLoading || lockOptions.isLoading ? (
             <Skeleton className="h-6 w-28" />
           ) : baseAprBps > 0n ? (
-            formatBps(baseAprBps)
+            <div className="flex items-baseline gap-0.5">
+              <NumberTicker value={Number(baseAprBps) / 100} decimalPlaces={2} className="text-white" />
+              <span>%</span>
+            </div>
           ) : (
             "—"
           )}
@@ -184,7 +192,10 @@ export function StatsRow({
           ) : positions.length === 0 ? (
             <span className="text-muted-foreground">No positions</span>
           ) : (
-            `${formatToken(totalRewards, decimals)} $Rwaan`
+            <div className="flex items-baseline gap-1">
+              <NumberTicker value={Number(formatUnits(totalRewards, decimals))} decimalPlaces={2} className="text-white" />
+              <span className="text-sm font-normal text-muted-foreground">$Rwaan</span>
+            </div>
           )}
         </div>
       </motion.div>

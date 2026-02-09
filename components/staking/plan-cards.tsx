@@ -5,6 +5,7 @@ import { useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
 import { useMounted } from "@/hooks/use-mounted";
@@ -82,7 +83,10 @@ export function PlanCards() {
                   {!mounted ? (
                     <Skeleton className="h-4 w-16 bg-[#F3BA2F]/20" />
                   ) : effectiveAprBps ? (
-                    <span className="text-sm font-bold tracking-wide">{formatBps(effectiveAprBps)} APR</span>
+                    <span className="text-sm font-bold tracking-wide flex items-center gap-1">
+                      <NumberTicker value={Number(effectiveAprBps) / 100} decimalPlaces={2} className="text-[#F3BA2F]" />
+                      <span>% APR</span>
+                    </span>
                   ) : (
                     "APR —"
                   )}
