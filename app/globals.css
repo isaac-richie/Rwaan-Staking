@@ -244,8 +244,26 @@ h3 {
 .is-scrolling .animate-liquid-mesh,
 .is-scrolling .animate-bubble-float-1,
 .is-scrolling .animate-bubble-float-2,
-.is-scrolling .animate-bubble-float-3 {
+.is-scrolling .animate-bubble-float-3,
+.is-scrolling .animate-liquid-drift-1,
+.is-scrolling .animate-liquid-drift-2,
+.is-scrolling .animate-liquid-drift-3,
+.is-scrolling .animate-liquid-drift-4,
+.is-scrolling .animate-liquid-drift-5,
+.is-scrolling .animate-orb-float-slow,
+.is-scrolling .animate-orb-float-slower,
+.is-scrolling .animate-orb-drift,
+.is-scrolling .animate-particle-float,
+.is-scrolling .animate-particle-drift {
   animation-play-state: paused !important;
+}
+
+/* Reduce blur complexity during scroll */
+.is-scrolling .bg-layer-bubbles,
+.is-scrolling .bg-layer-mesh,
+.is-scrolling .bg-layer-aura {
+  opacity: 0.3 !important;
+  transition: opacity 0.1s ease;
 }
 
 .animate-liquid-mesh {

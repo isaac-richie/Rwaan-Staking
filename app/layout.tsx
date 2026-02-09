@@ -11,6 +11,7 @@ import { CinematicBackground } from "@/components/backgrounds/cinematic-backgrou
 import { NetworkGuard } from "@/components/network-guard";
 import { WalletStateManager } from "@/components/wallet-state-manager";
 import { ScrollStabilityManager } from "@/components/scroll-stability-manager";
+import { ScrollPerformanceOptimizer } from "@/components/scroll-performance";
 import { Providers } from "./providers";
 
 const spaceGrotesk = Space_Grotesk({
@@ -49,6 +50,7 @@ export default function RootLayout({
           <ToastRoot>
             <WalletStateManager />
             <ScrollStabilityManager />
+            <ScrollPerformanceOptimizer />
             <CinematicBackground />
             <NetworkGuard />
             <div className="min-h-screen">
