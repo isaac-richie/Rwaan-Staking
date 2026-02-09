@@ -57,14 +57,18 @@ contract DeployRWANSecureStakingV3 is Script {
 
         // Add lock options
         console.log("Adding lock options...");
-        
-        // Lock Option 1: 3 months (90 days), 1.25x multiplier
-        staking.addLockOption(90 days, 12500, true);
-        console.log("Added Lock Option 1: 3 months, 1.25x multiplier");
 
-        // Lock Option 2: 6 months (180 days), 2x multiplier
-        staking.addLockOption(180 days, 20000, true);
-        console.log("Added Lock Option 2: 6 months, 2x multiplier");
+        // Lock Option 1: 30 days, 1.3x multiplier
+        staking.addLockOption(30 days, 13000, true);
+        console.log("Added Lock Option 1: 30 days, 1.3x multiplier");
+
+        // Lock Option 2: 90 days, 2.1x multiplier
+        staking.addLockOption(90 days, 21000, true);
+        console.log("Added Lock Option 2: 90 days, 2.1x multiplier");
+
+        // Lock Option 3: 180 days, 4x multiplier
+        staking.addLockOption(180 days, 40000, true);
+        console.log("Added Lock Option 3: 180 days, 4x multiplier");
 
         vm.stopBroadcast();
 

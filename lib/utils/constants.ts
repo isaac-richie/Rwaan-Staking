@@ -15,13 +15,18 @@ export const BSC_SCAN_BASE = "https://bscscan.com/tx/";
 
 export const STAKING_PLANS = [
   {
+    id: "plan-1m",
+    label: "30 Days",
+    durationSeconds: 30 * 24 * 60 * 60,
+  },
+  {
     id: "plan-3m",
-    label: "3 months",
+    label: "90 Days",
     durationSeconds: 90 * 24 * 60 * 60,
   },
   {
     id: "plan-6m",
-    label: "6 months",
+    label: "180 Days",
     durationSeconds: 180 * 24 * 60 * 60,
   },
 ] as const;
