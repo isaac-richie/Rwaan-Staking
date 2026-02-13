@@ -16,6 +16,9 @@ contract MockERC20 is ERC20 {
 }
 
 contract RWANSecureStakingV3Test is Test {
+    // Mirror OpenZeppelin Pausable custom error so we can match it in tests
+    error EnforcedPause();
+
     RWANSecureStakingV3 public staking;
     MockERC20 public token;
 
@@ -481,6 +484,39 @@ contract RWANSecureStakingV3Test is Test {
         vm.prank(bob);
         vm.expectRevert("not owner");
         staking.withdraw(1);
+    }
+
+    // ============================================
+    // Test: Paused State Guards
+    // ============================================
+
+    function testWithdrawRevertsWhenPaused() public {
+        vm.prank(alice);
+        staking.stake(1000 ether, 0, address(0));
+
+        // Pause the contract
+        staking.pause();
+
+        // Normal withdraw should revert due to whenNotPaused
+        vm.prank(alice);
+        vm.expectRevert(EnforcedPause.selector);
+        staking.withdraw(1);
+    }
+
+    function testWithdrawEarlyRevertsWhenPaused() public {
+        vm.prank(alice);
+        staking.stake(1000 ether, 1, address(0));
+
+        // Move forward but still before unlock
+        vm.warp(block.timestamp + 30 days);
+
+        // Pause the contract
+        staking.pause();
+
+        // Early withdraw should revert due to whenNotPaused
+        vm.prank(alice);
+        vm.expectRevert(EnforcedPause.selector);
+        staking.withdrawEarly(1);
     }
 
     // ============================================

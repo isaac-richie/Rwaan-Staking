@@ -13,6 +13,7 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 import { RWAN_DECIMALS, RWAN_TOKEN_ADDRESS } from "@/lib/utils/constants";
 import { formatToken, formatUsd } from "@/lib/utils/format";
 import { useRwanMarket } from "@/components/crypto/use-rwan-market";
+import { HowToStakeGuide } from "@/components/staking/how-to-stake-guide";
 
 
 export function Hero() {
@@ -23,6 +24,7 @@ export function Hero() {
   const mounted = useMounted();
   const isMobile = useIsMobile();
   const [showDetails, setShowDetails] = useState(false);
+  const [showHowToStake, setShowHowToStake] = useState(false);
   const totalRewards = positions.reduce(
     (sum, position) => sum + position.pendingRewards,
     0n
@@ -98,8 +100,11 @@ export function Hero() {
           </AnimatePresence>
 
           <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center">
-            <Button asChild className="col-span-2 w-full shadow-[0_0_20px_rgba(243,186,47,0.2)] sm:w-auto mobile-tap press-effect font-semibold text-base py-6">
-              <a href="#stake-rwan">Stake Now</a>
+            <Button
+              onClick={() => setShowHowToStake(true)}
+              className="col-span-2 w-full shadow-[0_0_20px_rgba(243,186,47,0.2)] sm:w-auto mobile-tap press-effect font-semibold text-base py-6"
+            >
+              How to Stake
             </Button>
 
             <Button
@@ -171,6 +176,9 @@ export function Hero() {
           </div>
         </div>
       </div>
+
+      {/* How to Stake Guide Modal */}
+      <HowToStakeGuide open={showHowToStake} onOpenChange={setShowHowToStake} />
     </motion.section>
   );
 }

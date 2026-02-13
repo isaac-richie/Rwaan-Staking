@@ -9,6 +9,8 @@ import { bsc } from "wagmi/chains";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 const alchemyRpc = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
+const walletConnectProjectId =
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
 
 const { publicClient, webSocketPublicClient, chains } = configureChains(
   [bsc],
@@ -54,15 +56,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-        {hasValidPrivyAppId ? (
+      {hasValidPrivyAppId ? (
         <PrivyProvider
-            appId={safePrivyAppId}
+          appId={safePrivyAppId}
           config={{
             loginMethods: ["wallet"],
             appearance: {
               theme: "dark",
               accentColor: "#FACC15",
               logo: undefined,
+              walletList: [
+                "detected_wallets",
+                "metamask",
+                "wallet_connect", // Enables TrustWallet and other WalletConnect wallets
+                "coinbase_wallet",
+                "rainbow",
+                "phantom",
+              ],
             },
             // CRITICAL: Disable auto-connect/auto-login
             // Users must explicitly click "Connect wallet"
@@ -70,7 +80,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               createOnLogin: "off",
             },
             // Do NOT auto-connect previously connected wallets
-            walletConnectCloudProjectId: undefined,
+            walletConnectCloudProjectId: walletConnectProjectId || undefined,
             // Default to BSC chain
             defaultChain: bsc,
             // Supported chains (only BSC)

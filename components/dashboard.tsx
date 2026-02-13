@@ -38,6 +38,7 @@ export function Dashboard() {
     <div className="flex flex-col gap-12">
       <Hero />
       <Section
+        id="staking-plans"
         title="Staking plans"
         description="Compare fixed-term plans with clear APR and withdrawal rules."
       >

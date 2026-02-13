@@ -5,14 +5,16 @@ export function Section({
   description,
   children,
   className,
+  id,
 }: {
   title: string;
   description?: string;
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }) {
   return (
-    <section className={cn("flex flex-col gap-4 sm:gap-6 mobile-section-sep", className)}>
+    <section id={id} className={cn("flex flex-col gap-4 sm:gap-6 mobile-section-sep", className)}>
       <div className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold sm:text-xl">{title}</h2>
         {description ? (

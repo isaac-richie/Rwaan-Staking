@@ -27,6 +27,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
 import { useCryptoPrices } from "@/components/crypto/use-crypto-prices";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { HowToStakeGuide } from "@/components/staking/how-to-stake-guide";
+import { HelpCircle } from "lucide-react";
 
 export function StakingActionsPanel() {
   const { address } = useAccount();
@@ -56,6 +58,7 @@ export function StakingActionsPanel() {
   const [selectedPlanId, setSelectedPlanId] = useState<
     (typeof STAKING_PLANS)[number]["id"]
   >(STAKING_PLANS[0].id);
+  const [showHowToStake, setShowHowToStake] = useState(false);
 
   const parsedAmount = useMemo(() => {
     if (!amount) return null;
@@ -223,10 +226,24 @@ export function StakingActionsPanel() {
   return (
     <Card className="glass-solid">
       <CardHeader>
-        <CardTitle>Stake $Rwaan</CardTitle>
-        <CardDescription>
-          Choose flexible or locked staking, approve $Rwaan, and create a position.
-        </CardDescription>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <CardTitle>Stake $Rwaan</CardTitle>
+            <CardDescription>
+              Choose flexible or locked staking, approve $Rwaan, and create a position.
+            </CardDescription>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowHowToStake(true)}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 hover:bg-primary/10"
+          >
+            <HelpCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">How to Stake</span>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {!address ? (
@@ -446,6 +463,9 @@ export function StakingActionsPanel() {
           </>
         )}
       </CardContent>
+
+      {/* How to Stake Guide Modal */}
+      <HowToStakeGuide open={showHowToStake} onOpenChange={setShowHowToStake} />
     </Card>
   );
 }

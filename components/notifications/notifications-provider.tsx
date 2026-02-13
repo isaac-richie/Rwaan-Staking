@@ -49,7 +49,10 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     try {
       const stored = window.localStorage.getItem(storageKey);
       if (!stored) return;
-      const parsed = JSON.parse(stored) as NotificationItem[];
+      if (typeof stored !== "string") return;
+      const trimmed = stored.trim();
+      if (!trimmed.startsWith("[") && !trimmed.startsWith("{")) return;
+      const parsed = JSON.parse(trimmed) as NotificationItem[];
       if (Array.isArray(parsed)) {
         setNotifications(parsed);
         return;
