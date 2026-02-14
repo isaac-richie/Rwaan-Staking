@@ -5,6 +5,7 @@ import { useAccount } from "wagmi";
 import { LockOptionsManager } from "@/components/admin/LockOptionsManager";
 import { OwnershipTransferForm } from "@/components/admin/OwnershipTransferForm";
 import { RecoverERC20Form } from "@/components/admin/RecoverERC20Form";
+import { FundOverview } from "@/components/admin/FundOverview"; // New component
 import { RewardNotifier } from "@/components/admin/RewardNotifier";
 import { EmergencyControls } from "@/components/admin/EmergencyControls";
 import { StakingSettings } from "@/components/admin/StakingSettings";
@@ -18,10 +19,10 @@ export function AdminPanel({ forceShow = false }: { forceShow?: boolean }) {
   const mounted = useMounted();
   const { address, isConnected } = useAccount();
   const owner = useOwner();
-  
+
   // CRITICAL: Require wagmi connection for admin actions
   const walletConnected = isConnected && !!address;
-  
+
   // CRITICAL: Check wallet is connected AND address matches owner
   const isOwner =
     walletConnected &&
@@ -68,6 +69,7 @@ export function AdminPanel({ forceShow = false }: { forceShow?: boolean }) {
           </div>
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <FundOverview />
           <EmergencyControls />
           <StakingSettings />
           <LockOptionsManager />

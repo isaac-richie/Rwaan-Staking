@@ -250,3 +250,47 @@ export function useReferralsPaused() {
     functionName: "referralsPaused",
   });
 }
+
+export function useReferralReserve() {
+  return useReadContract({
+    address: RWAN_STAKING_ADDRESS,
+    abi: RWAN_STAKING_ABI,
+    functionName: "referralReserve",
+    query: {
+      refetchInterval: 5_000,
+      gcTime: 5_000,
+      staleTime: 5_000,
+    },
+  });
+}
+
+export function useStakingContractBalance() {
+  return useReadContract({
+    address: "0xACB921bf2Dac2F7E8E101AAd9CA013d6Af5C648a", // RWAN Token
+    abi: [{
+      name: "balanceOf",
+      type: "function",
+      stateMutability: "view",
+      inputs: [{ name: "account", type: "address" }],
+      outputs: [{ name: "", type: "uint256" }],
+    }],
+    functionName: "balanceOf",
+    args: [RWAN_STAKING_ADDRESS],
+    query: {
+      refetchInterval: 5_000,
+    },
+  });
+}
+
+export function useReferralEarnings(address?: `0x${string}`) {
+  return useReadContract({
+    address: RWAN_STAKING_ADDRESS,
+    abi: RWAN_STAKING_ABI,
+    functionName: "referralEarnings",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: Boolean(address),
+      refetchInterval: 10_000,
+    },
+  });
+}
