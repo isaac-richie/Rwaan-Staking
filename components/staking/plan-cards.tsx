@@ -63,7 +63,12 @@ export function PlanCards() {
       }}
       className="grid gap-4 sm:grid-cols-2"
     >
-      {STAKING_PLANS.map((plan) => (
+      {STAKING_PLANS.filter(plan => {
+        const option = lockOptions.options.find(
+          (item) => item && item.duration === BigInt(plan.durationSeconds)
+        );
+        return option && option.active;
+      }).map((plan) => (
         (() => {
           const option = lockOptions.options
             .filter(

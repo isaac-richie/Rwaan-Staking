@@ -266,85 +266,122 @@ export function StakingActionsPanel() {
           />
         ) : (
           <>
-            <Tabs value={mode} onValueChange={(value) => setMode(value as "flexible" | "locked")}>
-              <TabsList>
-                <TabsTrigger value="flexible">Flexible</TabsTrigger>
-                <TabsTrigger value="locked">Locked</TabsTrigger>
-              </TabsList>
-              <TabsContent value="flexible">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-muted-foreground">
-                  Withdraw anytime. No lockup, standard rewards.
-                </div>
-              </TabsContent>
-              <TabsContent value="locked">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {STAKING_PLANS.map((plan) => (
-                    (() => {
-                      const option = lockOptions.options
-                        .filter(
-                          (item): item is NonNullable<typeof item> =>
-                            Boolean(item)
-                        )
-                        .find(
-                          (item) =>
-                            item.duration === BigInt(plan.durationSeconds)
-                        );
-                      const multiplierBps = option?.multiplierBps ? BigInt(option.multiplierBps) : 10_000n;
-                      const effectiveAprBps =
-                        baseAprBps > 0n
-                          ? (baseAprBps * multiplierBps) / 10_000n
-                          : 0n;
-                      return (
-                        <motion.button
-                          key={plan.id}
-                          type="button"
-                          whileHover={isMobile ? undefined : { y: -3 }}
-                          whileTap={isMobile ? undefined : { scale: 0.98 }}
-                          transition={isMobile ? undefined : { duration: 0.18 }}
-                          onClick={() => setSelectedPlanId(plan.id)}
-                          className={cn(
-                            "relative glass rounded-2xl border px-4 py-3 text-left transition-all duration-200 sm:px-5 sm:py-4",
-                            selectedPlanId === plan.id
-                              ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(250,204,21,0.3)] ring-2 ring-primary/30"
-                              : "border-white/10 hover:border-white/20 hover:bg-white/5"
-                          )}
-                        >
-                          {/* Selected Indicator */}
-                          {selectedPlanId === plan.id && (
-                            <motion.div
-                              initial={{ scale: 0, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-black"
-                            >
-                              ✓
-                            </motion.div>
-                          )}
+            {/* Compute active status */}
+            {(() => {
+              const isFlexibleEnabled = lockOptions.options.some(
+                (opt) => opt && opt.duration === 0n && opt.active
+              );
 
-                          <div className={cn(
-                            "text-xs uppercase tracking-[0.3em]",
-                            selectedPlanId === plan.id ? "text-primary" : "text-muted-foreground"
-                          )}>
-                            Plan
-                          </div>
-                          <div className={cn(
-                            "mt-2 text-base font-semibold sm:text-lg",
-                            selectedPlanId === plan.id ? "text-primary" : "text-foreground"
-                          )}>
-                            {plan.label}
-                          </div>
-                          <div className={cn(
-                            "mt-1 text-sm",
-                            selectedPlanId === plan.id ? "text-primary/80" : "text-muted-foreground"
-                          )}>
-                            {effectiveAprBps ? `${formatBps(effectiveAprBps)} APR` : "APR —"}
-                          </div>
-                        </motion.button>
-                      );
-                    })()
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
+              // Filter locked plans: Only show plans if they exist on-chain and are active
+              const activeLockedPlans = STAKING_PLANS.filter((plan) => {
+                const option = lockOptions.options.find(
+                  (opt) => opt && opt.duration === BigInt(plan.durationSeconds)
+                );
+                return option && option.active;
+              });
+
+              return (
+                <Tabs value={mode} onValueChange={(value) => setMode((value as "flexible" | "locked"))}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="locked">Locked</TabsTrigger>
+                    {isFlexibleEnabled ? (
+                      <TabsTrigger value="flexible">Flexible</TabsTrigger>
+                    ) : (
+                      <TabsTrigger value="flexible" disabled className="opacity-50 cursor-not-allowed">
+                        Flexible (Disabled)
+                      </TabsTrigger>
+                    )}
+                  </TabsList>
+
+                  <TabsContent value="flexible">
+                    {isFlexibleEnabled ? (
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-muted-foreground">
+                        Withdraw anytime. No lockup, standard rewards.
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+                        Flexible staking is currently disabled for new deposits. Existing positions remain active.
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="locked">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {activeLockedPlans.length > 0 ? (
+                        activeLockedPlans.map((plan) => (
+                          (() => {
+                            const option = lockOptions.options
+                              .filter(
+                                (item): item is NonNullable<typeof item> =>
+                                  Boolean(item)
+                              )
+                              .find(
+                                (item) =>
+                                  item.duration === BigInt(plan.durationSeconds)
+                              );
+                            const multiplierBps = option?.multiplierBps ? BigInt(option.multiplierBps) : 10_000n;
+                            const effectiveAprBps =
+                              baseAprBps > 0n
+                                ? (baseAprBps * multiplierBps) / 10_000n
+                                : 0n;
+                            return (
+                              <motion.button
+                                key={plan.id}
+                                type="button"
+                                whileHover={isMobile ? undefined : { y: -3 }}
+                                whileTap={isMobile ? undefined : { scale: 0.98 }}
+                                transition={isMobile ? undefined : { duration: 0.18 }}
+                                onClick={() => setSelectedPlanId(plan.id)}
+                                className={cn(
+                                  "relative glass rounded-2xl border px-4 py-3 text-left transition-all duration-200 sm:px-5 sm:py-4",
+                                  selectedPlanId === plan.id
+                                    ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(250,204,21,0.3)] ring-2 ring-primary/30"
+                                    : "border-white/10 hover:border-white/20 hover:bg-white/5"
+                                )}
+                              >
+                                {/* Selected Indicator */}
+                                {selectedPlanId === plan.id && (
+                                  <motion.div
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-black"
+                                  >
+                                    ✓
+                                  </motion.div>
+                                )}
+
+                                <div className={cn(
+                                  "text-xs uppercase tracking-[0.3em]",
+                                  selectedPlanId === plan.id ? "text-primary" : "text-muted-foreground"
+                                )}>
+                                  Plan
+                                </div>
+                                <div className={cn(
+                                  "mt-2 text-base font-semibold sm:text-lg",
+                                  selectedPlanId === plan.id ? "text-primary" : "text-foreground"
+                                )}>
+                                  {plan.label}
+                                </div>
+                                <div className={cn(
+                                  "mt-1 text-sm",
+                                  selectedPlanId === plan.id ? "text-primary/80" : "text-muted-foreground"
+                                )}>
+                                  {effectiveAprBps ? `${formatBps(effectiveAprBps)} APR` : "APR —"}
+                                </div>
+                              </motion.button>
+                            );
+                          })()
+                        ))
+                      ) : (
+                        <div className="col-span-full text-center text-sm text-muted-foreground py-8">
+                          No active locked plans available at the moment.
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              );
+            })()}
 
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Available balance</span>
