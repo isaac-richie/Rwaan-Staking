@@ -51,11 +51,9 @@ export function CryptoTicker({
               Market feed unavailable. Showing fallback values.
             </div>
           ) : (
-            <motion.div
-              className="flex w-max gap-3"
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ duration: 40, ease: "linear", repeat: Infinity }}
-              whileHover={{ animationPlayState: "paused" }}
+            <div
+              className="flex w-max gap-3 animate-marquee hover:[animation-play-state:paused]"
+              style={{ "--duration": "40s", "--gap": "0.75rem" } as React.CSSProperties}
             >
               {tickerItems.map((token, index) => (
                 <TickerItem
@@ -64,7 +62,7 @@ export function CryptoTicker({
                   price={prices.find((item) => item.symbol === token.symbol)}
                 />
               ))}
-            </motion.div>
+            </div>
           )}
         </div>
         {error && prices.length > 0 ? (

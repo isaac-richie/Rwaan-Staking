@@ -204,6 +204,14 @@ const config: Config = {
           "0%": { opacity: "1" },
           "100%": { opacity: "0" },
         },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(calc(-100% - var(--gap)))" },
+        },
+        "marquee-vertical": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(calc(-100% - var(--gap)))" },
+        },
       },
       animation: {
         "gradient-shift": "gradient-shift 42s ease-in-out infinite",
@@ -230,6 +238,8 @@ const config: Config = {
         "slide-out-to-right": "slide-out-to-right 0.2s ease-in",
         "fade-in": "fade-in 0.2s ease-out",
         "fade-out": "fade-out 0.15s ease-in",
+        marquee: "marquee var(--duration) linear infinite",
+        "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
       },
     },
   },

@@ -109,7 +109,15 @@ h3 {
 }
 
 .interactive-card {
-  @apply transition-all duration-200 ease-soft-spring hover:-translate-y-1 hover:border-white/20 hover:bg-white/10;
+  transition-property: transform, background-color, border-color;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.interactive-card:hover {
+  transform: translateY(-0.25rem);
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .badge-shimmer {
@@ -259,12 +267,19 @@ h3 {
 /* AppKit modal open: smooth pause */
 .appkit-open .glass {
   animation-play-state: paused !important;
-  will-change: transform, opacity;
+  /* Removed will-change to prevent layer flashing */
 }
 
 .appkit-open .glass::before {
   opacity: 0 !important;
   transition: opacity 0.2s ease;
+}
+
+body.appkit-open {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  /* Prevent AppKit from adding double padding since we have scrollbar-gutter */
+  padding-right: 0 !important;
 }
 
 /* Reduce blur complexity during scroll */

@@ -217,7 +217,7 @@ export function Footer() {
                 }}
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back to footer
+                Back
               </button>
               <div className="text-sm font-semibold text-foreground">
                 {docContent.title}

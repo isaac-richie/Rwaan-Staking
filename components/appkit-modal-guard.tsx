@@ -13,10 +13,13 @@ export function AppKitModalGuard() {
   useEffect(() => {
     if (typeof document === "undefined") return;
     const root = document.documentElement;
+    const body = document.body;
     if (open) {
       root.classList.add("appkit-open");
+      body.classList.add("appkit-open");
     } else {
       root.classList.remove("appkit-open");
+      body.classList.remove("appkit-open");
     }
   }, [open]);
 

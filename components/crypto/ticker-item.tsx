@@ -26,11 +26,9 @@ export function TickerItem({
   const highlight = token.highlight;
 
   return (
-    <motion.div
-      whileHover={{ y: -3 }}
-      transition={{ duration: 0.2 }}
+    <div
       className={cn(
-        "flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-muted-foreground",
+        "flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-muted-foreground transition-transform duration-200 hover:-translate-y-0.5",
         highlight && "border-primary/40 text-foreground shadow-glow"
       )}
     >
@@ -48,6 +46,6 @@ export function TickerItem({
       >
         {isPositive ? "▲" : "▼"} {formatChange(change)}
       </span>
-    </motion.div>
+    </div>
   );
 }
