@@ -1,5 +1,5 @@
 // hooks/use-early-withdrawal.ts
-import { useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useReadContract, useWriteContract } from 'wagmi';
 import { RWAN_STAKING_ABI, RWAN_STAKING_ADDRESS } from '@/lib/contracts/rwanStakingAbi';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -7,13 +7,12 @@ import { useQueryClient } from '@tanstack/react-query';
  * Hook to check if a position can be withdrawn without penalty
  */
 export function useCanWithdrawWithoutPenalty(positionId: bigint | undefined) {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: 'canWithdrawWithoutPenalty',
     args: positionId !== undefined ? [positionId] : undefined,
-    enabled: positionId !== undefined,
-    watch: true,
+    query: { enabled: positionId !== undefined },
   });
 }
 
@@ -22,13 +21,12 @@ export function useCanWithdrawWithoutPenalty(positionId: bigint | undefined) {
  * Returns [penaltyAmount, netAmount]
  */
 export function useEarlyWithdrawalPenalty(positionId: bigint | undefined) {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: 'calculateEarlyWithdrawalPenalty',
     args: positionId !== undefined ? [positionId] : undefined,
-    enabled: positionId !== undefined,
-    watch: true,
+    query: { enabled: positionId !== undefined },
   });
 }
 
@@ -36,7 +34,7 @@ export function useEarlyWithdrawalPenalty(positionId: bigint | undefined) {
  * Hook to get the early withdrawal penalty constant (35%)
  */
 export function useEarlyWithdrawalPenaltyBps() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: 'EARLY_WITHDRAWAL_PENALTY_BPS',
@@ -49,13 +47,12 @@ export function useEarlyWithdrawalPenaltyBps() {
 export function useWithdrawEarly() {
   const queryClient = useQueryClient();
 
-  return useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: 'withdrawEarly',
-    onSuccess() {
-      // Invalidate all position-related queries
-      queryClient.invalidateQueries();
+  return useWriteContract({
+    mutation: {
+      onSuccess() {
+        // Invalidate all position-related queries
+        queryClient.invalidateQueries();
+      },
     },
   });
 }

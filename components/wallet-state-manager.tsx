@@ -10,7 +10,6 @@
 
 import { useWalletStateGuard } from "@/hooks/use-wallet-guard";
 import { useAutoSwitchToBsc } from "@/hooks/use-auto-switch-bsc";
-import { useStrictDisconnect } from "@/hooks/use-strict-disconnect";
 
 export function WalletStateManager() {
   // This hook runs the cleanup logic on disconnect
@@ -18,9 +17,6 @@ export function WalletStateManager() {
   
   // This hook auto-switches to BSC on connect
   useAutoSwitchToBsc();
-  
-  // This hook enforces strict disconnect (Privy + wagmi sync)
-  useStrictDisconnect();
   
   // This component doesn't render anything
   return null;

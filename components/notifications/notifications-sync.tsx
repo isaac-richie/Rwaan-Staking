@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAccount, useContractEvent } from "wagmi";
+import { useAccount } from "wagmi";
+import { useWatchContractEvent } from "wagmi";
 
 import { useNotifications } from "@/components/notifications/notifications-provider";
 import { usePositionsWithRewards } from "@/hooks/use-positions";
@@ -32,11 +33,11 @@ export function NotificationsSync() {
     });
   }, [address, positions, addNotification]);
 
-  useContractEvent({
+  useWatchContractEvent({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     eventName: "ReferralEarned",
-    listener(logs) {
+    onLogs(logs) {
       if (!address) return;
       logs.forEach((log) => {
         const referrer = log.args?.referrer as `0x${string}` | undefined;

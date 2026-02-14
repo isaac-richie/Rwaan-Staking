@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAccount, useContractRead, useContractReads } from "wagmi";
+import { useAccount, useReadContract, useReadContracts } from "wagmi";
 
 import { RWAN_STAKING_ABI, RWAN_STAKING_ADDRESS } from "@/lib/contracts/rwanStakingAbi";
 import { MAX_LOCK_OPTIONS } from "@/lib/utils/constants";
@@ -7,62 +7,62 @@ import type { LockOption } from "@/types/staking";
 import type { AprTier } from "@/lib/utils/staking";
 
 export function useTotalStaked() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "totalStaked",
-    watch: true,
+    query: {
+      refetchInterval: 5_000,
+    },
   });
 }
 
 export function useStakingToken() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "stakingToken",
-    watch: false,
   });
 }
 
 export function useOwner() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "owner",
-    watch: false,
   });
 }
 
 export function useUserPositionIds() {
   const { address } = useAccount();
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "userPositions",
     args: address ? [address] : undefined,
-    enabled: Boolean(address),
-    watch: true,
+    query: {
+      enabled: Boolean(address),
+      refetchInterval: 5_000,
+    },
   });
 }
 
 export function useLockOptions() {
-  const count = useContractRead({
+  const count = useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "lockOptionsLength",
-    watch: false,
   });
 
   const size = Math.min(Number(count.data ?? 0), MAX_LOCK_OPTIONS);
 
-  const optionsResult = useContractReads({
+  const optionsResult = useReadContracts({
     contracts: Array.from({ length: size }).map((_, index) => ({
       address: RWAN_STAKING_ADDRESS,
       abi: RWAN_STAKING_ABI,
-      functionName: "lockOptions",
-      args: [BigInt(index)],
-    })),
-    watch: false,
+      functionName: "lockOptions" as const,
+      args: [BigInt(index)] as const,
+    })) as any,
   });
 
   const options = useMemo(() => {
@@ -71,15 +71,15 @@ export function useLockOptions() {
         ?.map((item, index) => {
           const result = item.result as
             | {
-                duration: bigint;
-                multiplierBps: bigint;
-                active: boolean;
-              }
+              duration: bigint;
+              multiplierBps: bigint;
+              active: boolean;
+            }
             | {
-                duration: bigint;
-                multiplierBps: bigint;
-                enabled: boolean;
-              }
+              duration: bigint;
+              multiplierBps: bigint;
+              enabled: boolean;
+            }
             | readonly [bigint, bigint, boolean]
             | undefined;
           if (!result) return null;
@@ -113,25 +113,27 @@ export function useLockOptions() {
 }
 
 export function useAprTiers() {
-  const count = useContractRead({
+  const count = useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "aprTiersLength",
-    watch: false,
-    cacheTime: 10_000,
+    query: {
+      gcTime: 10_000,
+    },
   });
 
   const size = Math.min(Number(count.data ?? 0), 25);
 
-  const tiersResult = useContractReads({
+  const tiersResult = useReadContracts({
     contracts: Array.from({ length: size }).map((_, index) => ({
       address: RWAN_STAKING_ADDRESS,
       abi: RWAN_STAKING_ABI,
-      functionName: "aprTiers",
-      args: [BigInt(index)],
-    })),
-    watch: false,
-    cacheTime: 10_000,
+      functionName: "aprTiers" as const,
+      args: [BigInt(index)] as const,
+    })) as any,
+    query: {
+      gcTime: 10_000,
+    },
   });
 
   const tiers = useMemo(() => {
@@ -140,9 +142,9 @@ export function useAprTiers() {
         ?.map((item) => {
           const result = item.result as
             | {
-                minTVL: bigint;
-                aprBps: bigint;
-              }
+              minTVL: bigint;
+              aprBps: bigint;
+            }
             | readonly [bigint, bigint]
             | undefined;
           if (!result) return null;
@@ -163,46 +165,54 @@ export function useAprTiers() {
 }
 
 export function useCurrentAprBps() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "currentAprBps",
-    watch: true,
+    query: {
+      refetchInterval: 5_000,
+    },
   });
 }
 
 export function useTotalWeightedStaked() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "totalWeightedStaked",
-    watch: true,
+    query: {
+      refetchInterval: 5_000,
+    },
   });
 }
 
 export function useRewardReserve() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "rewardReserve",
-    watch: true,
-    cacheTime: 5_000,
-    staleTime: 5_000,
+    query: {
+      refetchInterval: 5_000,
+      gcTime: 5_000,
+      staleTime: 5_000,
+    },
   });
 }
 
 // Contract State
 export function usePaused() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "paused",
-    watch: true,
+    query: {
+      refetchInterval: 5_000,
+    },
   });
 }
 
 export function useMinStakeAmount() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "minStakeAmount",
@@ -210,7 +220,7 @@ export function useMinStakeAmount() {
 }
 
 export function useMaxPositionsPerUser() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "maxPositionsPerUser",
@@ -218,7 +228,7 @@ export function useMaxPositionsPerUser() {
 }
 
 export function useReferralBps() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "referralBps",
@@ -226,7 +236,7 @@ export function useReferralBps() {
 }
 
 export function useMinReferrerStake() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "minReferrerStake",
@@ -234,7 +244,7 @@ export function useMinReferrerStake() {
 }
 
 export function useReferralsPaused() {
-  return useContractRead({
+  return useReadContract({
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "referralsPaused",

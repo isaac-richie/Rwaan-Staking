@@ -11,6 +11,7 @@ import { RWAN_DECIMALS } from "@/lib/utils/constants";
 import { formatBps, formatToken, formatUsd } from "@/lib/utils/format";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
 import { useCryptoPrices } from "@/components/crypto/use-crypto-prices";
+import { MagneticCard } from "@/components/ui/magnetic-card";
 
 export function StatsRow({
   decimals = RWAN_DECIMALS,
@@ -77,128 +78,126 @@ export function StatsRow({
   if (!mounted) {
     return (
       <div className="grid gap-4 md:grid-cols-3">
-        <motion.div
-          whileHover={isMobile ? undefined : { y: -4 }}
-          transition={isMobile ? undefined : { duration: 0.2 }}
-          className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
-        >
+        <MagneticCard className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5">
           <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Total Staked
           </div>
           <div className="mt-3 text-2xl font-semibold">
             <Skeleton className="h-6 w-32" />
           </div>
-        </motion.div>
-        <motion.div
-          whileHover={isMobile ? undefined : { y: -4 }}
-          transition={isMobile ? undefined : { duration: 0.2 }}
-          className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
-        >
+        </MagneticCard>
+        <MagneticCard className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5">
           <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Base APR
           </div>
           <div className="mt-3 text-2xl font-semibold">
             <Skeleton className="h-6 w-28" />
           </div>
-        </motion.div>
-        <motion.div
-          whileHover={isMobile ? undefined : { y: -4 }}
-          transition={isMobile ? undefined : { duration: 0.2 }}
-          className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5"
-        >
+        </MagneticCard>
+        <MagneticCard className="glass glass-solid interactive-card rounded-2xl p-4 sm:p-5">
           <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             {showData ? "Your Claimable" : "Connect Wallet"}
           </div>
           <div className="mt-3 text-2xl font-semibold">
             <Skeleton className="h-6 w-28" />
           </div>
-        </motion.div>
+        </MagneticCard>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
-      <motion.div
-        whileHover={isMobile ? undefined : { y: -4 }}
-        transition={isMobile ? undefined : { duration: 0.2 }}
-        className="sleek-card interactive-card p-5 sm:p-6"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
-            Total Staked
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{
+        hidden: { opacity: 0 },
+        show: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2
+          }
+        }
+      }}
+      className="grid gap-3 sm:gap-4 md:grid-cols-3"
+    >
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+        <MagneticCard className="sleek-card interactive-card p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+              Total Staked
+            </div>
           </div>
-        </div>
-        <div className="mt-3 text-2xl font-semibold">
-          {totalStaked.isLoading || isPricesLoading ? (
-            <Skeleton className="h-6 w-32" />
-          ) : totalStaked.data !== undefined ? (
-            <div className="flex flex-col gap-1">
-              <div className="flex flex-row items-baseline gap-0.5">
-                <span>$</span>
-                <NumberTicker value={totalStakedUsd ?? 0} decimalPlaces={0} className="text-white" />
+          <div className="mt-3 text-2xl font-semibold">
+            {totalStaked.isLoading || isPricesLoading ? (
+              <Skeleton className="h-6 w-32" />
+            ) : totalStaked.data !== undefined ? (
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-row items-baseline gap-0.5">
+                  <span>$</span>
+                  <NumberTicker value={totalStakedUsd ?? 0} decimalPlaces={0} className="text-white" />
+                </div>
+                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  <NumberTicker value={Number(formatUnits(totalStaked.data, decimals))} decimalPlaces={2} className="text-muted-foreground" />
+                  <span>$Rwaan</span>
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground flex items-center gap-1">
-                <NumberTicker value={Number(formatUnits(totalStaked.data, decimals))} decimalPlaces={2} className="text-muted-foreground" />
-                <span>$Rwaan</span>
+            ) : (
+              "—"
+            )}
+          </div>
+        </MagneticCard>
+      </motion.div>
+
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+        <MagneticCard className="sleek-card interactive-card p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+              Base APR
+            </div>
+          </div>
+          <div className="mt-3 text-2xl font-semibold">
+            {currentApr.isLoading || lockOptions.isLoading ? (
+              <Skeleton className="h-6 w-28" />
+            ) : baseAprBps > 0n ? (
+              <div className="flex items-baseline gap-0.5">
+                <NumberTicker value={Number(baseAprBps) / 100} decimalPlaces={2} className="text-white" />
+                <span>%</span>
+              </div>
+            ) : (
+              "—"
+            )}
+          </div>
+        </MagneticCard>
+      </motion.div>
+
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+        <MagneticCard className="sleek-card interactive-card p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+              {showData ? "Your Claimable" : "Connect Wallet"}
+            </div>
+          </div>
+          <div className="mt-3 text-2xl font-semibold">
+            {!showData ? (
+              <span className="text-sm text-muted-foreground">
+                Connect to view your rewards
               </span>
-            </div>
-          ) : (
-            "—"
-          )}
-        </div>
-      </motion.div>
-      <motion.div
-        whileHover={isMobile ? undefined : { y: -4 }}
-        transition={isMobile ? undefined : { duration: 0.2 }}
-        className="sleek-card interactive-card p-5 sm:p-6"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
-            Base APR
+            ) : positions.length === 0 ? (
+              <span className="text-muted-foreground">No positions</span>
+            ) : (
+              <div className="flex items-baseline gap-1">
+                <NumberTicker value={Number(formatUnits(totalRewards, decimals))} decimalPlaces={2} className="text-white" />
+                <span className="text-sm font-normal text-muted-foreground">$Rwaan</span>
+              </div>
+            )}
           </div>
-        </div>
-        <div className="mt-3 text-2xl font-semibold">
-          {currentApr.isLoading || lockOptions.isLoading ? (
-            <Skeleton className="h-6 w-28" />
-          ) : baseAprBps > 0n ? (
-            <div className="flex items-baseline gap-0.5">
-              <NumberTicker value={Number(baseAprBps) / 100} decimalPlaces={2} className="text-white" />
-              <span>%</span>
-            </div>
-          ) : (
-            "—"
-          )}
-        </div>
+        </MagneticCard>
       </motion.div>
-      <motion.div
-        whileHover={isMobile ? undefined : { y: -4 }}
-        transition={isMobile ? undefined : { duration: 0.2 }}
-        className="sleek-card interactive-card p-5 sm:p-6"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <span className="h-1 w-1 rounded-full bg-[#F3BA2F]/50"></span>
-          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
-            {showData ? "Your Claimable" : "Connect Wallet"}
-          </div>
-        </div>
-        <div className="mt-3 text-2xl font-semibold">
-          {!showData ? (
-            <span className="text-sm text-muted-foreground">
-              Connect to view your rewards
-            </span>
-          ) : positions.length === 0 ? (
-            <span className="text-muted-foreground">No positions</span>
-          ) : (
-            <div className="flex items-baseline gap-1">
-              <NumberTicker value={Number(formatUnits(totalRewards, decimals))} decimalPlaces={2} className="text-white" />
-              <span className="text-sm font-normal text-muted-foreground">$Rwaan</span>
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </div>
+    </motion.div>
   );
 }

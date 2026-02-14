@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Button } from "@/components/ui/button";
+import { MagneticCard } from "@/components/ui/magnetic-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { usePositionsWithRewards } from "@/hooks/use-positions";
@@ -140,7 +141,8 @@ export function Hero() {
             </Button>
           </div>
         </div>
-        <div className="w-full grid gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm sm:p-6 md:min-w-[260px] md:w-auto">
+
+        <MagneticCard className="w-full grid gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm sm:p-6 md:min-w-[260px] md:w-auto h-fit">
           <div>
             <div className="text-xs text-muted-foreground">
               Total $Rwaan value
@@ -170,11 +172,13 @@ export function Hero() {
             </div>
           </div>
           <div className="text-xs text-muted-foreground">
-            {address
-              ? "Live preview. Personalized to your wallet."
-              : "Connect to view rewards."}
+            {!mounted
+              ? "Connect to view rewards."
+              : address
+                ? "Live preview. Personalized to your wallet."
+                : "Connect to view rewards."}
           </div>
-        </div>
+        </MagneticCard>
       </div>
 
       {/* How to Stake Guide Modal */}

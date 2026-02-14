@@ -29,8 +29,10 @@ import { useCryptoPrices } from "@/components/crypto/use-crypto-prices";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { HowToStakeGuide } from "@/components/staking/how-to-stake-guide";
 import { HelpCircle } from "lucide-react";
+import { useMounted } from "@/hooks/use-mounted";
 
 export function StakingActionsPanel() {
+  const mounted = useMounted();
   const { address } = useAccount();
   const tokenAddress = useStakingToken();
   // Use hardcoded token address as fallback if contract read fails
@@ -222,6 +224,17 @@ export function StakingActionsPanel() {
       description: "Share it to earn referral rewards.",
     });
   };
+
+  if (!mounted) {
+    return (
+      <div className="glass glass-solid rounded-2xl p-6">
+        <div className="h-6 w-40 rounded-md bg-white/10" />
+        <div className="mt-3 h-4 w-64 rounded-md bg-white/10" />
+        <div className="mt-6 h-10 w-full rounded-xl bg-white/10" />
+        <div className="mt-4 h-12 w-full rounded-xl bg-white/10" />
+      </div>
+    );
+  }
 
   return (
     <Card className="glass-solid">

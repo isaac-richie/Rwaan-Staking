@@ -34,7 +34,7 @@ export function AdminPanel({ forceShow = false }: { forceShow?: boolean }) {
     return null;
   }
 
-  // CRITICAL: If wallet disconnected (either wagmi OR Privy), hide admin panel immediately
+  // CRITICAL: If wallet disconnected, hide admin panel immediately
   if (!walletConnected) {
     return null;
   }

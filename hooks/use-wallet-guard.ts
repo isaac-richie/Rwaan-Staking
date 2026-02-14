@@ -7,7 +7,6 @@
 import { useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
-import { usePrivy } from "@privy-io/react-auth";
 
 /**
  * Guards against stale wallet data
@@ -15,10 +14,8 @@ import { usePrivy } from "@privy-io/react-auth";
  */
 export function useWalletStateGuard() {
   const { address, isConnected } = useAccount();
-  const { authenticated } = usePrivy();
   const queryClient = useQueryClient();
   const prevAddress = useRef<string | undefined>(address);
-  const prevAuthenticated = useRef<boolean>(authenticated);
   const prevWalletReady = useRef<boolean>(Boolean(isConnected && address));
 
   useEffect(() => {
@@ -26,18 +23,13 @@ export function useWalletStateGuard() {
     const walletReady = Boolean(isConnected && address);
     const wasReady = prevWalletReady.current;
     const addressChanged = prevAddress.current !== address;
-    const authChanged = prevAuthenticated.current !== authenticated;
-
-    if ((wasReady && !walletReady) || (wasReady && addressChanged) || (authChanged && !authenticated)) {
+    if ((wasReady && !walletReady) || (wasReady && addressChanged)) {
       console.log("[WalletGuard] Clearing wallet state:", {
         wasConnected: wasReady,
         isNowDisconnected: !walletReady,
         addressChanged,
-        authChanged,
         prevAddress: prevAddress.current,
         newAddress: address,
-        prevAuth: prevAuthenticated.current,
-        newAuth: authenticated,
       });
 
       // Clear ALL React Query cache
@@ -47,18 +39,27 @@ export function useWalletStateGuard() {
       // Also explicitly invalidate all queries to trigger refetch when reconnected
       queryClient.invalidateQueries();
 
-      // Clear localStorage wallet data (if any)
+      // Clear localStorage wallet data to prevent auto-reconnect
       if (typeof window !== "undefined") {
-        // Add any wallet-specific localStorage keys here
-        // Example: localStorage.removeItem('wallet_data');
+        const keysToRemove = [
+          "wagmi.store",
+          "wagmi.recentConnectorId",
+          "wagmi.wallet",
+          "wagmi.connected",
+          "@rainbow-kit/recent-wallet",
+          "walletconnect"
+        ];
+
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+
+        console.log("[WalletGuard] Cleared persistent connection state");
       }
     }
 
     // Update refs for next comparison
     prevAddress.current = address;
-    prevAuthenticated.current = authenticated;
     prevWalletReady.current = walletReady;
-  }, [address, isConnected, authenticated, queryClient]);
+  }, [address, isConnected, queryClient]);
 }
 
 /**

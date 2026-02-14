@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { bsc } from "wagmi/chains";
 import { AlertCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,12 +9,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 export function NetworkGuard() {
-  const { isConnected } = useAccount();
-  const { chain } = useNetwork();
-  const { switchNetwork, isLoading, error } = useSwitchNetwork();
+  const { isConnected, chain } = useAccount();
+  const chainId = useChainId();
+  const { switchChain, isPending, error } = useSwitchChain();
   const [isDismissed, setIsDismissed] = useState(false);
 
-  const isWrongNetwork = isConnected && chain && chain.id !== bsc.id;
+  const isWrongNetwork = isConnected && chainId !== bsc.id;
 
   // Reset dismissed state when network changes
   useEffect(() => {
@@ -29,8 +29,8 @@ export function NetworkGuard() {
   }
 
   const handleSwitchNetwork = () => {
-    if (switchNetwork) {
-      switchNetwork(bsc.id);
+    if (switchChain) {
+      switchChain({ chainId: bsc.id });
     }
   };
 
@@ -72,11 +72,11 @@ export function NetworkGuard() {
           <div className="flex items-center gap-2">
             <Button
               onClick={handleSwitchNetwork}
-              disabled={!switchNetwork || isLoading}
+              disabled={!switchChain || isPending}
               size="sm"
               className="bg-amber-500 hover:bg-amber-600 text-black font-medium"
             >
-              {isLoading ? "Switching..." : "Switch to BSC"}
+              {isPending ? "Switching..." : "Switch to BSC"}
             </Button>
             <button
               onClick={() => setIsDismissed(true)}

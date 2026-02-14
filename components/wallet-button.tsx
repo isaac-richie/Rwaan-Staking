@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { usePrivy } from "@privy-io/react-auth";
-import { useAccount } from "wagmi";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
+import { useAccount, useDisconnect } from "wagmi";
 import { Copy, ExternalLink, LogOut, Wallet, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -18,8 +19,10 @@ import { formatAddress } from "@/lib/utils/format";
 import { useToast } from "@/components/ui/use-toast";
 
 export function WalletButton() {
-  const { ready, authenticated, login, logout, user } = usePrivy();
+  // const { openConnectModal } = useConnectModal();
+  const { open } = useAppKit();
   const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
   const { toast } = useToast();
 
   const walletAddress = useMemo(() => {
@@ -39,22 +42,17 @@ export function WalletButton() {
     }
   };
 
-  const handleDisconnect = async () => {
-    // CRITICAL: Logout from Privy first
-    await logout();
-    
-    // Force reload to clear all state
-    // This ensures wagmi also disconnects
-    window.location.reload();
+  const handleDisconnect = () => {
+    disconnect();
   };
 
-  if (!ready) {
-    return <Button disabled>Loading...</Button>;
-  }
-
-  if (!authenticated || !walletAddress) {
+  if (!walletAddress) {
     return (
-      <Button onClick={login} className="gap-2 px-3 py-2 text-xs sm:px-5 sm:py-3 sm:text-sm mobile-tap">
+      <Button
+        onClick={() => open()}
+        // disabled={!openConnectModal}
+        className="gap-2 px-3 py-2 text-xs sm:px-5 sm:py-3 sm:text-sm mobile-tap"
+      >
         <Wallet className="h-4 w-4" />
         Connect wallet
       </Button>
@@ -72,7 +70,7 @@ export function WalletButton() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72">
         <DropdownMenuLabel>Connected Wallet</DropdownMenuLabel>
-        
+
         {/* Wallet Address Display */}
         <div className="px-3 py-2">
           <div className="rounded-lg border border-white/10 bg-white/5 p-3">
@@ -109,8 +107,8 @@ export function WalletButton() {
         <DropdownMenuSeparator />
 
         {/* Disconnect */}
-        <DropdownMenuItem 
-          onClick={handleDisconnect} 
+        <DropdownMenuItem
+          onClick={handleDisconnect}
           className="gap-3 cursor-pointer text-red-400 focus:text-red-400 focus:bg-red-500/10"
         >
           <LogOut className="h-4 w-4" />

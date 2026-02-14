@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAccount, useContractReads } from "wagmi";
+import { useAccount, useReadContracts } from "wagmi";
 
 import { RWAN_STAKING_ABI } from "@/lib/contracts/rwanStakingAbi";
 import { RWAN_STAKING_ADDRESS } from "@/lib/utils/constants";
@@ -13,28 +13,32 @@ export function usePositionsWithRewards() {
   const ids = useUserPositionIds();
   const positionIds = (ids.data ?? []) as bigint[];
 
-  const positionReads = useContractReads({
+  const positionReads = useReadContracts({
     contracts: positionIds.map((positionId) => ({
       address: RWAN_STAKING_ADDRESS,
       abi: RWAN_STAKING_ABI,
-      functionName: "positions",
-      args: [positionId],
-    })),
-    // CRITICAL: Only fetch when wallet is connected
-    enabled: walletReady && positionIds.length > 0,
-    watch: true,
+      functionName: "positions" as const,
+      args: [positionId] as const,
+    })) as any,
+    query: {
+      // CRITICAL: Only fetch when wallet is connected
+      enabled: walletReady && positionIds.length > 0,
+      refetchInterval: 5_000,
+    },
   });
 
-  const rewardsReads = useContractReads({
+  const rewardsReads = useReadContracts({
     contracts: positionIds.map((positionId) => ({
       address: RWAN_STAKING_ADDRESS,
       abi: RWAN_STAKING_ABI,
-      functionName: "pendingRewards",
-      args: [positionId],
-    })),
-    // CRITICAL: Only fetch when wallet is connected
-    enabled: walletReady && positionIds.length > 0,
-    watch: true,
+      functionName: "pendingRewards" as const,
+      args: [positionId] as const,
+    })) as any,
+    query: {
+      // CRITICAL: Only fetch when wallet is connected
+      enabled: walletReady && positionIds.length > 0,
+      refetchInterval: 5_000,
+    },
   });
 
   const positions = useMemo(() => {
@@ -45,14 +49,14 @@ export function usePositionsWithRewards() {
       .map((id, index) => {
         const position = positionReads.data?.[index]?.result as
           | {
-              amount: bigint;
-              weightedAmount: bigint;
-              startTime: bigint;
-              unlockTime: bigint;
-              lockId: bigint;
-              rewardDebt: bigint;
-              withdrawn: boolean;
-            }
+            amount: bigint;
+            weightedAmount: bigint;
+            startTime: bigint;
+            unlockTime: bigint;
+            lockId: bigint;
+            rewardDebt: bigint;
+            withdrawn: boolean;
+          }
           | readonly [bigint, bigint, bigint, bigint, bigint, bigint, boolean]
           | undefined;
         const pendingRewards = rewardsReads.data?.[index]?.result as

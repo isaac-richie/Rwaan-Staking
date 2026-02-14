@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useWaitForTransaction } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 import { useToast } from "@/components/ui/use-toast";
 import { useNotifications } from "@/components/notifications/notifications-provider";
@@ -19,9 +19,11 @@ export function useTransactionToasts() {
   const [tracked, setTracked] = useState<TrackedTx | null>(null);
   const queryClient = useQueryClient();
 
-  const { data, status, error } = useWaitForTransaction({
+  const { data, status, error } = useWaitForTransactionReceipt({
     hash: tracked?.hash,
-    enabled: Boolean(tracked?.hash),
+    query: {
+      enabled: Boolean(tracked?.hash),
+    },
   });
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export function useTransactionToasts() {
 
   useEffect(() => {
     if (!tracked) return;
-    if (status === "success" && data) {
+    if (status === "success" && data && data.status === "success") {
       // Build success description with action and amount details
       let description = "Your transaction was finalized on-chain.";
       if (tracked.action && tracked.amount) {

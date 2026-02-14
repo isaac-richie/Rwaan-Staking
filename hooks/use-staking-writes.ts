@@ -1,32 +1,29 @@
-import { useContractWrite } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { zeroAddress } from "viem";
 
 import { RWAN_STAKING_ABI } from "@/lib/contracts/rwanStakingAbi";
 import { RWAN_STAKING_ADDRESS } from "@/lib/utils/constants";
 
 export function useStakeFlexible() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "stake",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const stakeFlexible = async (amount: bigint, referrer?: `0x${string}`) => {
     const referral = referrer ?? zeroAddress;
     // V3: lockId 0 = flexible/no lock
-    const result = await writeAsync?.({ args: [amount, 0n, referral] });
-    return result?.hash;
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "stake",
+      args: [amount, 0n, referral]
+    });
+    return result;
   };
 
-  return { stakeFlexible, isPending: isLoading };
+  return { stakeFlexible, isPending: isPending };
 }
 
 export function useStakeLocked() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "stake",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const stakeLocked = async (
     amount: bigint,
@@ -34,307 +31,317 @@ export function useStakeLocked() {
     referrer?: `0x${string}`
   ) => {
     const referral = referrer ?? zeroAddress;
-    const result = await writeAsync?.({ args: [amount, lockId, referral] });
-    return result?.hash;
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "stake",
+      args: [amount, lockId, referral]
+    });
+    return result;
   };
 
-  return { stakeLocked, isPending: isLoading };
+  return { stakeLocked, isPending: isPending };
 }
 
 export function useClaimPosition() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "claim",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const claim = async (positionId: bigint) => {
-    
-    const result = await writeAsync?.({ args: [positionId] });
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "claim",
+      args: [positionId]
+    });
+    return result;
   };
 
-  return { claim, isPending: isLoading };
+  return { claim, isPending: isPending };
 }
 
 export function useWithdrawPosition() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "withdraw",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const withdraw = async (positionId: bigint) => {
-    
-    const result = await writeAsync?.({ args: [positionId] });
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "withdraw",
+      args: [positionId]
+    });
+    return result;
   };
 
-  return { withdraw, isPending: isLoading };
+  return { withdraw, isPending: isPending };
 }
 
 export function useAddLockOption() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "addLockOption",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const addLockOption = async (
     duration: number | bigint,
     multiplierBps: number | bigint,
     enabled: boolean
   ) => {
-    const result = await writeAsync?.({
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "addLockOption",
       args: [
         BigInt(duration),
         Number(multiplierBps),
         enabled
       ],
     });
-    return result?.hash;
+    return result;
   };
 
-  return { addLockOption, isPending: isLoading };
+  return { addLockOption, isPending: isPending };
 }
 
 export function useSetLockOption() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "setLockOption",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const setLockOption = async (
     lockId: number | bigint,
     multiplierBps: number | bigint,
     enabled: boolean
   ) => {
-    const result = await writeAsync?.({
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "setLockOption",
       args: [
         BigInt(lockId),
         Number(multiplierBps),
         enabled
       ],
     });
-    return result?.hash;
+    return result;
   };
 
-  return { setLockOption, isPending: isLoading };
+  return { setLockOption, isPending: isPending };
 }
 
 export function useFundRewards() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "fundRewards",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const fundRewards = async (amount: bigint) => {
-    
-    const result = await writeAsync?.({ args: [amount] });
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "fundRewards",
+      args: [amount]
+    });
+    return result;
   };
 
-  return { fundRewards, isPending: isLoading };
+  return { fundRewards, isPending: isPending };
 }
 
 export function useFundReferralRewards() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "fundReferralRewards",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const fundReferralRewards = async (amount: bigint) => {
-    
-    const result = await writeAsync?.({ args: [amount] });
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "fundReferralRewards",
+      args: [amount]
+    });
+    return result;
   };
 
-  return { fundReferralRewards, isPending: isLoading };
+  return { fundReferralRewards, isPending: isPending };
 }
 
 export function useRecoverERC20() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "recoverERC20",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const recoverERC20 = async (
     token: `0x${string}`,
     amount: bigint
   ) => {
-    const result = await writeAsync?.({
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "recoverERC20",
       args: [token, amount],
     });
-    return result?.hash;
+    return result;
   };
 
-  return { recoverERC20, isPending: isLoading };
+  return { recoverERC20, isPending: isPending };
 }
 
 export function useTransferOwnership() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "transferOwnership",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const transferOwnership = async (newOwner: `0x${string}`) => {
-    
-    const result = await writeAsync?.({
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "transferOwnership",
       args: [newOwner],
     });
-    return result?.hash;
+    return result;
   };
 
-  return { transferOwnership, isPending: isLoading };
+  return { transferOwnership, isPending: isPending };
 }
 
 // Pause/Unpause
 export function usePause() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "pause",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const pause = async () => {
-    
-    const result = await writeAsync?.();
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "pause",
+    });
+    return result;
   };
 
-  return { pause, isPending: isLoading };
+  return { pause, isPending: isPending };
 }
 
 export function useUnpause() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "unpause",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const unpause = async () => {
-    
-    const result = await writeAsync?.();
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "unpause",
+    });
+    return result;
   };
 
-  return { unpause, isPending: isLoading };
+  return { unpause, isPending: isPending };
 }
 
 // Staking Settings
 export function useSetMinStakeAmount() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "setMinStakeAmount",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const setMinStakeAmount = async (amount: bigint) => {
-    
-    const result = await writeAsync?.({ args: [amount] });
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "setMinStakeAmount",
+      args: [amount]
+    });
+    return result;
   };
 
-  return { setMinStakeAmount, isPending: isLoading };
+  return { setMinStakeAmount, isPending: isPending };
 }
 
 export function useSetMaxPositionsPerUser() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "setMaxPositionsPerUser",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const setMaxPositionsPerUser = async (maxPositions: bigint) => {
-    
-    const result = await writeAsync?.({ args: [maxPositions] });
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "setMaxPositionsPerUser",
+      args: [maxPositions]
+    });
+    return result;
   };
 
-  return { setMaxPositionsPerUser, isPending: isLoading };
+  return { setMaxPositionsPerUser, isPending: isPending };
 }
 
 // Referral Settings
 export function useSetReferralBps() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "setReferralBps",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const setReferralBps = async (bps: bigint) => {
-    
-    const result = await writeAsync?.({ args: [bps] });
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "setReferralBps",
+      args: [bps]
+    });
+    return result;
   };
 
-  return { setReferralBps, isPending: isLoading };
+  return { setReferralBps, isPending: isPending };
 }
 
 export function useSetMinReferrerStake() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "setMinReferrerStake",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const setMinReferrerStake = async (amount: bigint) => {
-    
-    const result = await writeAsync?.({ args: [amount] });
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "setMinReferrerStake",
+      args: [amount]
+    });
+    return result;
   };
 
-  return { setMinReferrerStake, isPending: isLoading };
+  return { setMinReferrerStake, isPending: isPending };
 }
 
 export function usePauseReferrals() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "pauseReferrals",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const pauseReferrals = async () => {
-    
-    const result = await writeAsync?.();
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "pauseReferrals",
+    });
+    return result;
   };
 
-  return { pauseReferrals, isPending: isLoading };
+  return { pauseReferrals, isPending: isPending };
 }
 
 export function useUnpauseReferrals() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "unpauseReferrals",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const unpauseReferrals = async () => {
-    
-    const result = await writeAsync?.();
-    return result?.hash;
+
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "unpauseReferrals",
+    });
+    return result;
   };
 
-  return { unpauseReferrals, isPending: isLoading };
+  return { unpauseReferrals, isPending: isPending };
 }
 
 export function useEmergencyRecoverRewards() {
-  const { writeAsync, isLoading } = useContractWrite({
-    address: RWAN_STAKING_ADDRESS,
-    abi: RWAN_STAKING_ABI,
-    functionName: "emergencyRecoverRewards",
-  });
+  const { writeContractAsync, isPending } = useWriteContract();
 
   const emergencyRecoverRewards = async (to: `0x${string}`) => {
-    const result = await writeAsync?.({ args: [to] });
-    return result?.hash;
+    const result = await writeContractAsync?.({
+      address: RWAN_STAKING_ADDRESS,
+      abi: RWAN_STAKING_ABI,
+      functionName: "emergencyRecoverRewards",
+      args: [to]
+    });
+    return result;
   };
 
-  return { emergencyRecoverRewards, isPending: isLoading };
+  return { emergencyRecoverRewards, isPending: isPending };
 }

@@ -39,7 +39,7 @@ export function Dashboard() {
       <Hero />
       <Section
         id="staking-plans"
-        title="Staking plans"
+        title="Staking tiers"
         description="Compare fixed-term plans with clear APR and withdrawal rules."
       >
         <div id="plans" ref={plansRef} className="scroll-mt-28">

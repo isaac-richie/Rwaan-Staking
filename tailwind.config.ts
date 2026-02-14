@@ -64,21 +64,21 @@ const config: Config = {
           "100%": { transform: "translate3d(4%, -3%, 0)", opacity: "0.6" },
         },
         "aura-breathe": {
-          "0%": { 
-            transform: "scale(1) translate3d(0, 0, 0)", 
-            opacity: "0.5" 
+          "0%": {
+            transform: "scale(1) translate3d(0, 0, 0)",
+            opacity: "0.5"
           },
-          "33%": { 
-            transform: "scale(1.05) translate3d(-3%, 2%, 0)", 
-            opacity: "0.7" 
+          "33%": {
+            transform: "scale(1.05) translate3d(-3%, 2%, 0)",
+            opacity: "0.7"
           },
-          "66%": { 
-            transform: "scale(1.03) translate3d(3%, -2%, 0)", 
-            opacity: "0.65" 
+          "66%": {
+            transform: "scale(1.03) translate3d(3%, -2%, 0)",
+            opacity: "0.65"
           },
-          "100%": { 
-            transform: "scale(1) translate3d(0, 0, 0)", 
-            opacity: "0.5" 
+          "100%": {
+            transform: "scale(1) translate3d(0, 0, 0)",
+            opacity: "0.5"
           },
         },
         "hero-glow": {
@@ -148,21 +148,23 @@ const config: Config = {
           "100%": { backgroundPosition: "0% 50%" },
         },
         "pulse-glow": {
-          "0%, 100%": { 
-            boxShadow: "0 0 15px rgba(250, 204, 21, 0.25), 0 0 30px rgba(250, 204, 21, 0.15), inset 0 0 15px rgba(250, 204, 21, 0.1)" 
+          "0%, 100%": {
+            opacity: "0.5",
+            transform: "scale(1)"
           },
-          "50%": { 
-            boxShadow: "0 0 25px rgba(250, 204, 21, 0.45), 0 0 50px rgba(250, 204, 21, 0.25), inset 0 0 25px rgba(250, 204, 21, 0.15)" 
+          "50%": {
+            opacity: "0.8",
+            transform: "scale(1.05)"
           },
         },
         "capital-breathe": {
           "0%, 100%": {
             transform: "scale(1)",
-            boxShadow: "0 0 20px rgba(250, 204, 21, 0.12), 0 0 40px rgba(250, 204, 21, 0.06), 0 4px 20px rgba(0, 0, 0, 0.4)",
+            opacity: "0.7",
           },
           "50%": {
             transform: "scale(1.015)",
-            boxShadow: "0 0 25px rgba(250, 204, 21, 0.18), 0 0 50px rgba(250, 204, 21, 0.1), 0 5px 25px rgba(0, 0, 0, 0.45)",
+            opacity: "0.9",
           },
         },
         "halo-expand": {
@@ -176,20 +178,13 @@ const config: Config = {
           },
         },
         "flow-glow": {
-          "0%": {
-            boxShadow: "0 0 20px rgba(250, 204, 21, 0.4), 0 0 40px rgba(250, 204, 21, 0.2), inset 0 0 20px rgba(250, 204, 21, 0.1), -10px 0 30px rgba(250, 204, 21, 0.3)",
-          },
-          "25%": {
-            boxShadow: "0 0 25px rgba(250, 204, 21, 0.5), 0 0 50px rgba(250, 204, 21, 0.25), inset 0 0 25px rgba(250, 204, 21, 0.15), 0 -10px 30px rgba(250, 204, 21, 0.35)",
+          "0%, 100%": {
+            opacity: "0.6",
+            transform: "scale(1)",
           },
           "50%": {
-            boxShadow: "0 0 30px rgba(250, 204, 21, 0.6), 0 0 60px rgba(250, 204, 21, 0.3), inset 0 0 30px rgba(250, 204, 21, 0.2), 10px 0 30px rgba(250, 204, 21, 0.4)",
-          },
-          "75%": {
-            boxShadow: "0 0 25px rgba(250, 204, 21, 0.5), 0 0 50px rgba(250, 204, 21, 0.25), inset 0 0 25px rgba(250, 204, 21, 0.15), 0 10px 30px rgba(250, 204, 21, 0.35)",
-          },
-          "100%": {
-            boxShadow: "0 0 20px rgba(250, 204, 21, 0.4), 0 0 40px rgba(250, 204, 21, 0.2), inset 0 0 20px rgba(250, 204, 21, 0.1), -10px 0 30px rgba(250, 204, 21, 0.3)",
+            opacity: "0.9",
+            transform: "scale(1.02)",
           },
         },
         // Toast slide-in animations

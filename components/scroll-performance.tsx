@@ -28,7 +28,7 @@ export function ScrollPerformanceOptimizer() {
                 scrollTimer = setTimeout(() => {
                     isScrolling = false;
                     document.documentElement.classList.remove("is-scrolling");
-                }, 150);
+                }, 100);
 
                 rafId = null;
             });

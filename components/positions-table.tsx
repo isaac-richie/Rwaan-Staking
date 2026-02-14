@@ -18,6 +18,7 @@ import { useWithdrawEarly, useEarlyWithdrawalPenalty } from "@/hooks/use-early-w
 
 import { useMounted } from "@/hooks/use-mounted";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { RWAN_STAKING_ABI, RWAN_STAKING_ADDRESS } from "@/lib/contracts/rwanStakingAbi";
 import { RWAN_DECIMALS, STAKING_PLANS } from "@/lib/utils/constants";
 import { formatBps, formatDateFromSeconds, formatToken, formatUsd } from "@/lib/utils/format";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
@@ -31,7 +32,7 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
   const { positions, isLoading } = usePositionsWithRewards();
   const { claim, isPending: isClaimPending } = useClaimPosition();
   const { withdraw, isPending: isWithdrawPending } = useWithdrawPosition();
-  const { writeAsync: withdrawEarly, isLoading: isWithdrawEarlyPending } = useWithdrawEarly();
+  const { writeContractAsync: withdrawEarly, isPending: isWithdrawEarlyPending } = useWithdrawEarly();
   const { trackTx } = useTransactionToasts();
   const lockOptions = useLockOptions();
   const totalStaked = useTotalStaked();
@@ -147,8 +148,12 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
     setPendingWithdrawId(selectedPositionForEarlyWithdraw);
 
     try {
-      const result = await withdrawEarly?.({ args: [selectedPositionForEarlyWithdraw] });
-      const hash = result?.hash;
+      const hash = await withdrawEarly?.({
+        address: RWAN_STAKING_ADDRESS,
+        abi: RWAN_STAKING_ABI,
+        functionName: "withdrawEarly",
+        args: [selectedPositionForEarlyWithdraw],
+      });
 
       if (!hash) {
         setPendingWithdrawId(null);

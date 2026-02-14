@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { MagneticCard } from "@/components/ui/magnetic-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { BorderBeam } from "@/components/ui/border-beam";
@@ -48,7 +49,20 @@ export function PlanCards() {
   }, [currentApr.data, totalStaked.data, aprTiers.tiers]);
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{
+        hidden: { opacity: 0 },
+        show: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.1
+          }
+        }
+      }}
+      className="grid gap-4 sm:grid-cols-2"
+    >
       {STAKING_PLANS.map((plan) => (
         (() => {
           const option = lockOptions.options
@@ -61,77 +75,84 @@ export function PlanCards() {
             baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
 
           return (
-            <motion.div
+            <MagneticCard
               key={plan.id}
-              whileHover={isMobile ? undefined : cardHover}
-              whileTap={{ scale: 0.98 }}
-              transition={isMobile ? undefined : { duration: 0.2 }}
               className={cn("sleek-card interactive-card p-6 sm:p-7 relative", getCardGlow('staking'))}
             >
-              {/* Add Border Beam to the 12-month (Best Value) plan */}
-              {plan.durationSeconds === 31536000 && (
-                <BorderBeam size={250} duration={12} delay={9} borderWidth={1.5} colorFrom="#F3BA2F" colorTo="#F3BA2F" />
-              )}
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="h-1 w-1 rounded-full bg-[#F3BA2F]"></span>
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#F3BA2F]/80 font-medium">
-                      {plan.label} Plan
-                    </span>
-                  </div>
-                  <div className="text-3xl font-bold text-white sm:text-4xl">
-                    {formatDuration(plan.durationSeconds)}
-                  </div>
-                </div>
-                <Badge variant="outline" className="border-gold-subtle bg-[#F3BA2F]/10 text-[#F3BA2F] px-4 py-1.5 backdrop-blur-md">
-                  {!mounted ? (
-                    <Skeleton className="h-4 w-16 bg-[#F3BA2F]/20" />
-                  ) : effectiveAprBps ? (
-                    <span className="text-sm font-bold tracking-wide flex items-center gap-1">
-                      <NumberTicker value={Number(effectiveAprBps) / 100} decimalPlaces={2} className="text-[#F3BA2F]" />
-                      <span>% APR</span>
-                    </span>
-                  ) : (
-                    "APR —"
-                  )}
-                </Badge>
-              </div>
-              <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={isMobile ? undefined : { duration: 0.2 }}
+                className="h-full"
+              >
+                {/* Add Border Beam to the 12-month (Best Value) plan */}
+                {plan.durationSeconds === 31536000 && (
+                  <BorderBeam size={250} duration={12} delay={9} borderWidth={1.5} colorFrom="#F3BA2F" colorTo="#F3BA2F" />
+                )}
                 <div className="flex items-center justify-between">
-                  <span>Lock duration</span>
-                  <span className="text-foreground">
-                    {formatDuration(plan.durationSeconds)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Boost multiplier</span>
-                  <span className="text-foreground">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="h-1 w-1 rounded-full bg-[#F3BA2F]"></span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-[#F3BA2F]/80 font-medium">
+                        {plan.label} Plan
+                      </span>
+                    </div>
+                    <div className="text-3xl font-bold text-white sm:text-4xl">
+                      {formatDuration(plan.durationSeconds)}
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="border-gold-subtle bg-[#F3BA2F]/10 text-[#F3BA2F] px-4 py-1.5 backdrop-blur-md">
                     {!mounted ? (
-                      <Skeleton className="inline-block h-4 w-8" />
+                      <Skeleton className="h-4 w-16 bg-[#F3BA2F]/20" />
+                    ) : effectiveAprBps ? (
+                      <span className="text-sm font-bold tracking-wide flex items-center gap-1">
+                        <NumberTicker value={Number(effectiveAprBps) / 100} decimalPlaces={2} className="text-[#F3BA2F]" />
+                        <span>% APR</span>
+                      </span>
                     ) : (
-                      `${(Number(multiplierBps) / 10000).toFixed(1)}x`
+                      "APR —"
                     )}
-                  </span>
+                  </Badge>
                 </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex cursor-default items-center justify-between">
-                        <span>Claiming</span>
-                        <span className="text-foreground">Anytime</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      Rewards accrue immediately and can be claimed anytime.
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </motion.div>
+                <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
+                  <div className="flex items-center justify-between">
+                    <span>Lock duration</span>
+                    <span className="text-foreground">
+                      {formatDuration(plan.durationSeconds)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Boost multiplier</span>
+                    <span className="text-foreground">
+                      {!mounted ? (
+                        <Skeleton className="inline-block h-4 w-8" />
+                      ) : (
+                        `${(Number(multiplierBps) / 10000).toFixed(1)}x`
+                      )}
+                    </span>
+                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex cursor-default items-center justify-between">
+                          <span>Claiming</span>
+                          <span className="text-foreground">Anytime</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Rewards accrue immediately and can be claimed anytime.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </motion.div>
+            </MagneticCard>
           );
         })()
       ))}
-    </div>
+    </motion.div>
   );
 }

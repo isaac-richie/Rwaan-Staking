@@ -20,9 +20,9 @@ contract UpdateLockOptions is Script {
         staking.setLockOption(1, 21000, true);
         console.log("Updated Lock ID 1 (90 days) to 2.1x");
 
-        // ID 2: 180 days -> 4x (40000 bps)
-        staking.setLockOption(2, 40000, true);
-        console.log("Updated Lock ID 2 (180 days) to 4x");
+        // ID 2: 180 days -> 6.25x (62500 bps) = 100% APR at 16% base
+        staking.setLockOption(2, 62500, true);
+        console.log("Updated Lock ID 2 (180 days) to 6.25x (100% APR)");
 
         // 2. Add new 30-day option (ID 3)
         // 30 days -> 1.3x (13000 bps)

@@ -1,5 +1,6 @@
 import "./globals.css";
 
+
 import type { Metadata } from "next";
 import { Space_Grotesk, Syne } from "next/font/google";
 
@@ -10,8 +11,8 @@ import { Footer } from "@/components/layout/footer";
 import { CinematicBackground } from "@/components/backgrounds/cinematic-background";
 import { NetworkGuard } from "@/components/network-guard";
 import { WalletStateManager } from "@/components/wallet-state-manager";
-import { ScrollStabilityManager } from "@/components/scroll-stability-manager";
 import { ScrollPerformanceOptimizer } from "@/components/scroll-performance";
+import { AppKitModalGuard } from "@/components/appkit-modal-guard";
 import { Providers } from "./providers";
 
 const spaceGrotesk = Space_Grotesk({
@@ -28,10 +29,8 @@ export const metadata: Metadata = {
   title: "$Rwaan Staking",
   description: "Stake $Rwaan on BNB Smart Chain with flexible and locked options.",
   icons: {
-    icon: [
-      { url: "/favicon.png", type: "image/png" },
-      { url: "/favicon-64.png", sizes: "64x64", type: "image/png" },
-    ],
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
     apple: "/favicon.png",
   },
 };
@@ -49,8 +48,8 @@ export default function RootLayout({
         <Providers>
           <ToastRoot>
             <WalletStateManager />
-            <ScrollStabilityManager />
             <ScrollPerformanceOptimizer />
+            <AppKitModalGuard />
             <CinematicBackground />
             <NetworkGuard />
             <div className="min-h-screen">
