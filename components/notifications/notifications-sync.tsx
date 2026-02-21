@@ -37,6 +37,8 @@ export function NotificationsSync() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     eventName: "ReferralEarned",
+    poll: true,
+    pollingInterval: 60_000,
     onLogs(logs) {
       if (!address) return;
       logs.forEach((log) => {

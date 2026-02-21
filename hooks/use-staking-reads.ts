@@ -12,7 +12,7 @@ export function useTotalStaked() {
     abi: RWAN_STAKING_ABI,
     functionName: "totalStaked",
     query: {
-      refetchInterval: 5_000,
+      refetchInterval: 60_000,
     },
   });
 }
@@ -42,7 +42,7 @@ export function useUserPositionIds() {
     args: address ? [address] : undefined,
     query: {
       enabled: Boolean(address),
-      refetchInterval: 5_000,
+      refetchInterval: 30_000,
     },
   });
 }
@@ -170,7 +170,7 @@ export function useCurrentAprBps() {
     abi: RWAN_STAKING_ABI,
     functionName: "currentAprBps",
     query: {
-      refetchInterval: 5_000,
+      refetchInterval: 60_000,
     },
   });
 }
@@ -181,7 +181,7 @@ export function useTotalWeightedStaked() {
     abi: RWAN_STAKING_ABI,
     functionName: "totalWeightedStaked",
     query: {
-      refetchInterval: 5_000,
+      refetchInterval: 60_000,
     },
   });
 }
@@ -192,9 +192,9 @@ export function useRewardReserve() {
     abi: RWAN_STAKING_ABI,
     functionName: "rewardReserve",
     query: {
-      refetchInterval: 5_000,
-      gcTime: 5_000,
-      staleTime: 5_000,
+      refetchInterval: 60_000,
+      gcTime: 60_000,
+      staleTime: 60_000,
     },
   });
 }
@@ -206,7 +206,7 @@ export function usePaused() {
     abi: RWAN_STAKING_ABI,
     functionName: "paused",
     query: {
-      refetchInterval: 5_000,
+      refetchInterval: 60_000,
     },
   });
 }
@@ -257,9 +257,9 @@ export function useReferralReserve() {
     abi: RWAN_STAKING_ABI,
     functionName: "referralReserve",
     query: {
-      refetchInterval: 5_000,
-      gcTime: 5_000,
-      staleTime: 5_000,
+      refetchInterval: 60_000,
+      gcTime: 60_000,
+      staleTime: 60_000,
     },
   });
 }
@@ -277,7 +277,7 @@ export function useStakingContractBalance() {
     functionName: "balanceOf",
     args: [RWAN_STAKING_ADDRESS],
     query: {
-      refetchInterval: 5_000,
+      refetchInterval: 60_000,
     },
   });
 }
@@ -290,7 +290,7 @@ export function useReferralEarnings(address?: `0x${string}`) {
     args: address ? [address] : undefined,
     query: {
       enabled: Boolean(address),
-      refetchInterval: 10_000,
+      refetchInterval: 30_000,
     },
   });
 }

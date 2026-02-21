@@ -34,7 +34,7 @@ export function useTokenBalance(
     args: hasParams ? [account!] : undefined,
     query: {
       enabled: hasParams,
-      refetchInterval: 5_000,
+      refetchInterval: 30_000,
     },
   });
 }
@@ -51,7 +51,7 @@ export function useTokenAllowance(
     args: hasParams ? [owner!, RWAN_STAKING_ADDRESS] : undefined,
     query: {
       enabled: hasParams,
-      refetchInterval: 5_000,
+      refetchInterval: 30_000,
     },
   });
 }
