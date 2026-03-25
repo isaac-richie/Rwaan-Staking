@@ -34,6 +34,16 @@ const walletConnectProjectId =
   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
 const appName = "Rwaan Staking";
 
+const rpcUrls = [
+  defaultRpc,
+  "https://bsc.publicnode.com",
+  alchemyRpc,
+  alchemyRpc2,
+  alchemyRpc3,
+  alchemyRpc4,
+  alchemyRpc5,
+].filter(Boolean) as string[];
+
 // Bitget wallet adapter references `BitVisionWeb` directly in some environments.
 // Define it to avoid ReferenceError when the extension is not present.
 if (typeof globalThis !== "undefined" && !("BitVisionWeb" in globalThis)) {
@@ -86,17 +96,13 @@ const wagmiAdapter = new WagmiAdapter({
   projectId,
   transports: {
     [bsc.id]: fallback(
-      [
-        alchemyRpc,
-        alchemyRpc2,
-        alchemyRpc3,
-        alchemyRpc4,
-        alchemyRpc5,
-        defaultRpc,
-        "https://bsc.publicnode.com",
-      ]
-        .filter(Boolean)
-        .map((url) => http(url as string))
+      rpcUrls.map((url) =>
+        http(url, {
+          retryCount: 1,
+          retryDelay: 1_000,
+          timeout: 15_000,
+        })
+      )
     ),
   },
   ssr: true, // AppKit typically handles SSR better with this flag
@@ -161,9 +167,25 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 10_000,
+            staleTime: 30_000,
+            gcTime: 5 * 60_000,
             refetchOnWindowFocus: false,
-            retry: 2,
+            refetchOnReconnect: false,
+            refetchOnMount: false,
+            refetchIntervalInBackground: false,
+            retry: (failureCount, error) => {
+              const message =
+                error instanceof Error ? error.message : String(error);
+              if (
+                message.includes("429") ||
+                message.toLowerCase().includes("too many requests")
+              ) {
+                return false;
+              }
+              return failureCount < 1;
+            },
+            retryDelay: (attemptIndex) =>
+              Math.min(1_000 * 2 ** attemptIndex, 10_000),
           },
         },
       })

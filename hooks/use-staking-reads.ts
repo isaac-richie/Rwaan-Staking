@@ -42,7 +42,8 @@ export function useUserPositionIds() {
     args: address ? [address] : undefined,
     query: {
       enabled: Boolean(address),
-      refetchInterval: 30_000,
+      refetchInterval: 60_000,
+      refetchIntervalInBackground: false,
     },
   });
 }
@@ -290,7 +291,8 @@ export function useReferralEarnings(address?: `0x${string}`) {
     args: address ? [address] : undefined,
     query: {
       enabled: Boolean(address),
-      refetchInterval: 30_000,
+      refetchInterval: 60_000,
+      refetchIntervalInBackground: false,
     },
   });
 }

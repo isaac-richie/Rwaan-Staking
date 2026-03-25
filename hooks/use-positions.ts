@@ -23,7 +23,8 @@ export function usePositionsWithRewards() {
     query: {
       // CRITICAL: Only fetch when wallet is connected
       enabled: walletReady && positionIds.length > 0,
-      refetchInterval: 30_000,
+      refetchInterval: 60_000,
+      refetchIntervalInBackground: false,
     },
   });
 
@@ -37,7 +38,8 @@ export function usePositionsWithRewards() {
     query: {
       // CRITICAL: Only fetch when wallet is connected
       enabled: walletReady && positionIds.length > 0,
-      refetchInterval: 30_000,
+      refetchInterval: 60_000,
+      refetchIntervalInBackground: false,
     },
   });
 

@@ -34,7 +34,8 @@ export function useTokenBalance(
     args: hasParams ? [account!] : undefined,
     query: {
       enabled: hasParams,
-      refetchInterval: 30_000,
+      refetchInterval: 60_000,
+      refetchIntervalInBackground: false,
     },
   });
 }
@@ -51,7 +52,8 @@ export function useTokenAllowance(
     args: hasParams ? [owner!, RWAN_STAKING_ADDRESS] : undefined,
     query: {
       enabled: hasParams,
-      refetchInterval: 30_000,
+      refetchInterval: 60_000,
+      refetchIntervalInBackground: false,
     },
   });
 }
@@ -72,4 +74,3 @@ export function useApproveToken(tokenAddress?: `0x${string}`) {
 
   return { approve, isPending };
 }
-
