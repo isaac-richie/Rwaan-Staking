@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { parseUnits } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
+import { bsc } from "wagmi/chains";
 import confetti from "canvas-confetti";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useTokenAllowance, useTokenBalance, useTokenMetadata, useApproveToken } from "@/hooks/use-erc20";
 import { useReferral } from "@/hooks/use-referral";
 import { useTransactionToasts } from "@/hooks/use-transaction-toasts";
-import { useAprTiers, useCurrentAprBps, useLockOptions, useStakingToken, useTotalStaked } from "@/hooks/use-staking-reads";
+import { useAprTiers, useCurrentAprBps, useLockOptions, useMaxPositionsPerUser, useMinStakeAmount, useStakingToken, useTotalStaked, useUserPositionIds } from "@/hooks/use-staking-reads";
 import { useStakeFlexible, useStakeLocked } from "@/hooks/use-staking-writes";
 import {
   RWAN_DECIMALS,
@@ -30,10 +31,12 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 import { HowToStakeGuide } from "@/components/staking/how-to-stake-guide";
 import { HelpCircle } from "lucide-react";
 import { useMounted } from "@/hooks/use-mounted";
+import { parseContractError } from "@/lib/utils/contract-errors";
 
 export function StakingActionsPanel() {
   const mounted = useMounted();
   const { address } = useAccount();
+  const chainId = useChainId();
   const tokenAddress = useStakingToken();
   // Use hardcoded token address as fallback if contract read fails
   const effectiveTokenAddress = (tokenAddress.data as `0x${string}` | undefined) ?? RWAN_TOKEN_ADDRESS;
@@ -47,6 +50,9 @@ export function StakingActionsPanel() {
   const { trackTx } = useTransactionToasts();
   const lockOptions = useLockOptions();
   const totalStaked = useTotalStaked();
+  const minStakeAmount = useMinStakeAmount();
+  const maxPositionsPerUser = useMaxPositionsPerUser();
+  const userPositionIds = useUserPositionIds();
   const aprTiers = useAprTiers();
   const currentApr = useCurrentAprBps();
   const isMobile = useIsMobile();
@@ -116,8 +122,15 @@ export function StakingActionsPanel() {
     allowance.data !== undefined &&
     allowance.data < parsedAmount;
 
+  const isWrongNetwork = address ? chainId !== bsc.id : false;
+  const hasReachedPositionsLimit =
+    typeof maxPositionsPerUser.data === "bigint" &&
+    Array.isArray(userPositionIds.data) &&
+    BigInt(userPositionIds.data.length) >= maxPositionsPerUser.data;
+
   const disabled =
     !address ||
+    isWrongNetwork ||
     !parsedAmount ||
     parsedAmount <= 0n ||
     tokenAddress.isLoading ||
@@ -134,15 +147,30 @@ export function StakingActionsPanel() {
       });
       return;
     }
+    if (isWrongNetwork) {
+      toast({
+        title: "Wrong network",
+        description: "Please switch to BNB Smart Chain before approving.",
+      });
+      return;
+    }
     if (!parsedAmount) return;
-    const hash = await approve.approve(parsedAmount);
-    if (!hash) return;
-    trackTx(hash, {
-      title: "Approve $Rwaan",
-      successMessage: "Approval confirmed.",
-      errorMessage: "Approval failed.",
-      retry: handleApprove,
-    });
+    try {
+      const hash = await approve.approve(parsedAmount);
+      if (!hash) return;
+      trackTx(hash, {
+        title: "Approve $Rwaan",
+        successMessage: "Approval confirmed.",
+        errorMessage: "Approval failed.",
+        retry: handleApprove,
+      });
+    } catch (error) {
+      const parsed = parseContractError(error);
+      toast({
+        title: parsed.title,
+        description: parsed.description,
+      });
+    }
   };
 
   const handleStakeLocked = async () => {
@@ -155,30 +183,59 @@ export function StakingActionsPanel() {
       });
       return;
     }
+    if (isWrongNetwork) {
+      toast({
+        title: "Wrong network",
+        description: "Please switch to BNB Smart Chain before staking.",
+      });
+      return;
+    }
     if (!parsedAmount || !selectedOption) return;
-    const hash = await stakeLocked(parsedAmount, selectedOption.id, referrer ?? undefined);
-    if (!hash) return;
+    if (typeof minStakeAmount.data === "bigint" && parsedAmount < minStakeAmount.data) {
+      toast({
+        title: "Amount too low",
+        description: `Minimum stake is ${formatToken(minStakeAmount.data, decimals)} $Rwaan.`,
+      });
+      return;
+    }
+    if (hasReachedPositionsLimit) {
+      toast({
+        title: "Position limit reached",
+        description: "You reached the max number of open staking positions.",
+      });
+      return;
+    }
+    try {
+      const hash = await stakeLocked(parsedAmount, selectedOption.id, referrer ?? undefined);
+      if (!hash) return;
 
-    // Format the staked amount for notification
-    const formattedAmount = formatToken(parsedAmount, decimals);
-    const planLabel = STAKING_PLANS.find(p => BigInt(p.durationSeconds) === selectedOption.duration)?.label || "locked";
+      // Format the staked amount for notification
+      const formattedAmount = formatToken(parsedAmount, decimals);
+      const planLabel = STAKING_PLANS.find(p => BigInt(p.durationSeconds) === selectedOption.duration)?.label || "locked";
 
-    trackTx(hash, {
-      title: "Stake $Rwaan",
-      successMessage: "Locked position created.",
-      errorMessage: "Stake failed.",
-      retry: handleStakeLocked,
-      action: "Staked",
-      amount: `${formattedAmount} $Rwaan (${planLabel})`,
-    });
-    // Trigger confetti celebration
-    confetti({
-      particleCount: isMobile ? 40 : 100,
-      spread: isMobile ? 40 : 70,
-      origin: { y: 0.6 },
-      colors: ["#F3BA2F", "#ffffff"],
-    });
-    setAmount("");
+      trackTx(hash, {
+        title: "Stake $Rwaan",
+        successMessage: "Locked position created.",
+        errorMessage: "Stake failed.",
+        retry: handleStakeLocked,
+        action: "Staked",
+        amount: `${formattedAmount} $Rwaan (${planLabel})`,
+      });
+      // Trigger confetti celebration
+      confetti({
+        particleCount: isMobile ? 40 : 100,
+        spread: isMobile ? 40 : 70,
+        origin: { y: 0.6 },
+        colors: ["#F3BA2F", "#ffffff"],
+      });
+      setAmount("");
+    } catch (error) {
+      const parsed = parseContractError(error);
+      toast({
+        title: parsed.title,
+        description: parsed.description,
+      });
+    }
   };
 
   const handleStakeFlexible = async () => {
@@ -191,29 +248,58 @@ export function StakingActionsPanel() {
       });
       return;
     }
+    if (isWrongNetwork) {
+      toast({
+        title: "Wrong network",
+        description: "Please switch to BNB Smart Chain before staking.",
+      });
+      return;
+    }
     if (!parsedAmount) return;
-    const hash = await stakeFlexible(parsedAmount, referrer ?? undefined);
-    if (!hash) return;
+    if (typeof minStakeAmount.data === "bigint" && parsedAmount < minStakeAmount.data) {
+      toast({
+        title: "Amount too low",
+        description: `Minimum stake is ${formatToken(minStakeAmount.data, decimals)} $Rwaan.`,
+      });
+      return;
+    }
+    if (hasReachedPositionsLimit) {
+      toast({
+        title: "Position limit reached",
+        description: "You reached the max number of open staking positions.",
+      });
+      return;
+    }
+    try {
+      const hash = await stakeFlexible(parsedAmount, referrer ?? undefined);
+      if (!hash) return;
 
-    // Format the staked amount for notification
-    const formattedAmount = formatToken(parsedAmount, decimals);
+      // Format the staked amount for notification
+      const formattedAmount = formatToken(parsedAmount, decimals);
 
-    trackTx(hash, {
-      title: "Stake $Rwaan",
-      successMessage: "Flexible position created.",
-      errorMessage: "Stake failed.",
-      retry: handleStakeFlexible,
-      action: "Staked",
-      amount: `${formattedAmount} $Rwaan (Flexible)`,
-    });
-    // Trigger confetti celebration
-    confetti({
-      particleCount: isMobile ? 40 : 100,
-      spread: isMobile ? 40 : 70,
-      origin: { y: 0.6 },
-      colors: ["#F3BA2F", "#ffffff"],
-    });
-    setAmount("");
+      trackTx(hash, {
+        title: "Stake $Rwaan",
+        successMessage: "Flexible position created.",
+        errorMessage: "Stake failed.",
+        retry: handleStakeFlexible,
+        action: "Staked",
+        amount: `${formattedAmount} $Rwaan (Flexible)`,
+      });
+      // Trigger confetti celebration
+      confetti({
+        particleCount: isMobile ? 40 : 100,
+        spread: isMobile ? 40 : 70,
+        origin: { y: 0.6 },
+        colors: ["#F3BA2F", "#ffffff"],
+      });
+      setAmount("");
+    } catch (error) {
+      const parsed = parseContractError(error);
+      toast({
+        title: parsed.title,
+        description: parsed.description,
+      });
+    }
   };
 
   const handleCopyReferral = async () => {
