@@ -22,6 +22,11 @@ export function useStakingToken() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "stakingToken",
+    query: {
+      // The staking token address is set at deploy time and never changes.
+      staleTime: Infinity,
+      gcTime: 24 * 60 * 60_000, // keep in cache for a full session day
+    },
   });
 }
 
@@ -30,6 +35,11 @@ export function useOwner() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "owner",
+    query: {
+      // Owner changes are extremely rare (transferOwnership tx required).
+      staleTime: Infinity,
+      gcTime: 24 * 60 * 60_000,
+    },
   });
 }
 
@@ -53,6 +63,11 @@ export function useLockOptions() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "lockOptionsLength",
+    query: {
+      // Lock options are admin-configured and change very infrequently.
+      staleTime: 5 * 60_000,  // treat as fresh for 5 min
+      gcTime: 10 * 60_000,    // keep in cache for 10 min after unmount
+    },
   });
 
   const size = Math.min(Number(count.data ?? 0), MAX_LOCK_OPTIONS);
@@ -64,6 +79,10 @@ export function useLockOptions() {
       functionName: "lockOptions" as const,
       args: [BigInt(index)] as const,
     })) as any,
+    query: {
+      staleTime: 5 * 60_000,
+      gcTime: 10 * 60_000,
+    },
   });
 
   const options = useMemo(() => {
@@ -119,7 +138,9 @@ export function useAprTiers() {
     abi: RWAN_STAKING_ABI,
     functionName: "aprTiersLength",
     query: {
-      gcTime: 10_000,
+      // APR tiers are admin-set and very rarely change.
+      staleTime: 5 * 60_000,   // treat as fresh for 5 min
+      gcTime: 10 * 60_000,     // was 10s — now 10 min to survive remounts
     },
   });
 
@@ -133,7 +154,8 @@ export function useAprTiers() {
       args: [BigInt(index)] as const,
     })) as any,
     query: {
-      gcTime: 10_000,
+      staleTime: 5 * 60_000,
+      gcTime: 10 * 60_000,
     },
   });
 
@@ -217,6 +239,11 @@ export function useMinStakeAmount() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "minStakeAmount",
+    query: {
+      // Admin-set value, changes are rare on-chain txs.
+      staleTime: Infinity,
+      gcTime: 24 * 60 * 60_000,
+    },
   });
 }
 
@@ -225,6 +252,10 @@ export function useMaxPositionsPerUser() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "maxPositionsPerUser",
+    query: {
+      staleTime: Infinity,
+      gcTime: 24 * 60 * 60_000,
+    },
   });
 }
 
@@ -233,6 +264,10 @@ export function useReferralBps() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "referralBps",
+    query: {
+      staleTime: Infinity,
+      gcTime: 24 * 60 * 60_000,
+    },
   });
 }
 
@@ -241,6 +276,10 @@ export function useMinReferrerStake() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "minReferrerStake",
+    query: {
+      staleTime: Infinity,
+      gcTime: 24 * 60 * 60_000,
+    },
   });
 }
 
@@ -249,6 +288,11 @@ export function useReferralsPaused() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: "referralsPaused",
+    query: {
+      // Referral pause state is admin-toggled, not user-facing churn.
+      staleTime: 5 * 60_000,
+      gcTime: 10 * 60_000,
+    },
   });
 }
 

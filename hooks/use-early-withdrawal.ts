@@ -38,6 +38,11 @@ export function useEarlyWithdrawalPenaltyBps() {
     address: RWAN_STAKING_ADDRESS,
     abi: RWAN_STAKING_ABI,
     functionName: 'EARLY_WITHDRAWAL_PENALTY_BPS',
+    query: {
+      // Solidity constant — hardcoded at compile time, can never change.
+      staleTime: Infinity,
+      gcTime: 24 * 60 * 60_000,
+    },
   });
 }
 
