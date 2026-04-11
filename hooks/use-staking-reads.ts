@@ -80,6 +80,8 @@ export function useLockOptions() {
       args: [BigInt(index)] as const,
     })) as any,
     query: {
+      // CRITICAL: Don't fire an empty multicall — Alchemy returns 400 for []
+      enabled: size > 0,
       staleTime: 5 * 60_000,
       gcTime: 10 * 60_000,
     },
@@ -154,6 +156,8 @@ export function useAprTiers() {
       args: [BigInt(index)] as const,
     })) as any,
     query: {
+      // CRITICAL: Don't fire an empty multicall — Alchemy returns 400 for []
+      enabled: size > 0,
       staleTime: 5 * 60_000,
       gcTime: 10 * 60_000,
     },

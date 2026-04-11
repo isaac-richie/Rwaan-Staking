@@ -176,9 +176,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
             retry: (failureCount, error) => {
               const message =
                 error instanceof Error ? error.message : String(error);
+              // Never retry rate-limits — back off instead
               if (
                 message.includes("429") ||
                 message.toLowerCase().includes("too many requests")
+              ) {
+                return false;
+              }
+              // Never retry bad requests — the payload is wrong, retrying won't help
+              if (
+                message.includes("400") ||
+                message.toLowerCase().includes("bad request")
               ) {
                 return false;
               }
