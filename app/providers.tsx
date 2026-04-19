@@ -35,13 +35,13 @@ const walletConnectProjectId =
 const appName = "Rwaan Staking";
 
 const rpcUrls = [
-  defaultRpc,
-  "https://bsc.publicnode.com",
   alchemyRpc,
   alchemyRpc2,
   alchemyRpc3,
   alchemyRpc4,
   alchemyRpc5,
+  defaultRpc,
+  "https://bsc.publicnode.com",
 ].filter(Boolean) as string[];
 
 // Bitget wallet adapter references `BitVisionWeb` directly in some environments.
