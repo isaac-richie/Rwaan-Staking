@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { usePositionsWithRewards } from "@/hooks/use-positions";
 import { useMounted } from "@/hooks/use-mounted";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import { RWAN_DECIMALS, RWAN_TOKEN_ADDRESS } from "@/lib/utils/constants";
+import { RWAN_DECIMALS, RWAN_TOKEN_ADDRESS, STAKING_DAPP_URL } from "@/lib/utils/constants";
 import { formatToken, formatUsd } from "@/lib/utils/format";
 import { useRwanMarket } from "@/components/crypto/use-rwan-market";
 import { HowToStakeGuide } from "@/components/staking/how-to-stake-guide";
@@ -113,7 +113,9 @@ export function Hero() {
               variant="secondary"
               className="col-span-2 w-full sm:w-auto h-12 text-sm font-medium border-white/10 bg-white/5 hover:bg-white/10 hover:text-white"
             >
-              <a href="#plans">View Plans</a>
+              <a href={`${STAKING_DAPP_URL}#staking-plans`} target="_blank" rel="noreferrer">
+                View Plans
+              </a>
             </Button>
 
             <Button

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { MessageCircle, Twitter, ArrowLeft, Copy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { RWAN_STAKING_ADDRESS } from "@/lib/utils/constants";
+import { RWAN_STAKING_ADDRESS, STAKING_DAPP_URL } from "@/lib/utils/constants";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -151,8 +151,8 @@ export function Footer() {
               Quick Links
             </div>
             <div className="flex flex-col gap-3">
-              <FooterLink href="#stake-rwan" label="Stake Now" />
-              <FooterLink href="#staking-plans" label="View Plans" />
+              <FooterLink href={`${STAKING_DAPP_URL}#stake-rwan`} label="Stake Now" />
+              <FooterLink href={`${STAKING_DAPP_URL}#staking-plans`} label="View Plans" />
               <FooterLink
                 href="#"
                 label="Smart Contract"

@@ -12,6 +12,7 @@ export const ACCRUAL_DELAY_SECONDS = 3 * 24 * 60 * 60;
 export const CLAIM_DELAY_SECONDS = 30 * 24 * 60 * 60;
 
 export const BSC_SCAN_BASE = "https://bscscan.com/tx/";
+export const STAKING_DAPP_URL = "https://www.stakingrawlianalytics.xyz";
 
 export const STAKING_PLANS = [
   {
