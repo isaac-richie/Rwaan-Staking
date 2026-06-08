@@ -5,21 +5,22 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-full text-sm font-medium transition-all duration-200 ease-soft-spring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 mobile-tap press-effect",
+  "inline-flex items-center justify-center gap-2 rounded-xl text-sm font-medium transition-all duration-200 ease-soft-spring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-40 mobile-tap",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-glow hover:opacity-90 hover:-translate-y-[1px] button-shimmer",
+          "bg-[#F3BA2F] text-[hsl(225,25%,5%)] font-semibold shadow-[0_0_20px_rgba(243,186,47,0.15)] hover:bg-[#E8A817] hover:shadow-[0_0_30px_rgba(243,186,47,0.2)] active:scale-[0.97] button-shimmer",
         secondary:
-          "bg-white/10 text-foreground border border-white/10 hover:bg-white/15",
-        ghost: "bg-transparent text-foreground hover:bg-white/10",
+          "bg-white/[0.04] text-white/70 border border-white/[0.06] hover:bg-white/[0.08] hover:text-white/90 hover:border-white/[0.1] active:scale-[0.97]",
+        ghost:
+          "bg-transparent text-white/50 hover:bg-white/[0.04] hover:text-white/70 active:scale-[0.97]",
         outline:
-          "border border-white/15 text-foreground hover:bg-white/10",
+          "border border-white/[0.08] text-white/60 hover:bg-white/[0.04] hover:text-white/80 hover:border-white/[0.12] active:scale-[0.97]",
       },
       size: {
         default: "h-11 px-5",
-        sm: "h-9 px-4",
+        sm: "h-9 px-3.5 text-[13px]",
         lg: "h-12 px-6",
       },
     },

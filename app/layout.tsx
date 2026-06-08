@@ -1,6 +1,5 @@
 import "./globals.css";
 
-
 import type { Metadata } from "next";
 import { Space_Grotesk, Syne } from "next/font/google";
 
@@ -26,8 +25,8 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "$Rwaan Staking",
-  description: "Stake $Rwaan on BNB Smart Chain with flexible and locked options.",
+  title: "$Rwaan Staking — Premium Yield on BNB Chain",
+  description: "Stake $Rwaan on BNB Smart Chain with flexible and locked options. Earn premium yield with confidence.",
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",
@@ -43,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${spaceGrotesk.variable} ${syne.variable} font-sans bg-background text-foreground`}
+        className={`${spaceGrotesk.variable} ${syne.variable} font-sans`}
       >
         <Providers>
           <ToastRoot>
@@ -52,9 +51,9 @@ export default function RootLayout({
             <AppKitModalGuard />
             <CinematicBackground />
             <NetworkGuard />
-            <div className="min-h-screen">
+            <div className="relative min-h-screen flex flex-col">
               <SiteHeader />
-              <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-20 pt-8 sm:gap-12 sm:pb-24 sm:pt-10 md:px-8">
+              <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 pb-16 pt-8 sm:gap-12 sm:pb-20 sm:pt-10 md:px-8">
                 {children}
               </main>
               <Footer />

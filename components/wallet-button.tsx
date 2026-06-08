@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAppKit } from "@reown/appkit/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { Copy, ExternalLink, LogOut, Wallet, ChevronDown } from "lucide-react";
@@ -19,7 +18,6 @@ import { formatAddress } from "@/lib/utils/format";
 import { useToast } from "@/components/ui/use-toast";
 
 export function WalletButton() {
-  // const { openConnectModal } = useConnectModal();
   const { open } = useAppKit();
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
@@ -50,11 +48,11 @@ export function WalletButton() {
     return (
       <Button
         onClick={() => open()}
-        // disabled={!openConnectModal}
-        className="gap-2 px-3 py-2 text-xs sm:px-5 sm:py-3 sm:text-sm mobile-tap"
+        className="gap-2 h-10 px-4 text-[13px] font-semibold sm:px-5"
       >
-        <Wallet className="h-4 w-4" />
-        Connect wallet
+        <Wallet className="h-3.5 w-3.5" />
+        <span className="hidden sm:inline">Connect Wallet</span>
+        <span className="sm:hidden">Connect</span>
       </Button>
     );
   }
@@ -62,57 +60,60 @@ export function WalletButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" className="gap-2 px-3 py-2 text-xs sm:px-5 sm:py-3 sm:text-sm mobile-tap">
-          <Wallet className="h-4 w-4" />
-          {shortAddress ?? "Wallet"}
-          <ChevronDown className="h-4 w-4 opacity-50" />
+        <Button
+          variant="secondary"
+          className="gap-2 h-10 px-3.5 text-[13px] font-medium sm:px-4 border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.06]"
+        >
+          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#F3BA2F]/10">
+            <Wallet className="h-3 w-3 text-[#F3BA2F]" />
+          </span>
+          <span className="font-mono text-white/70">{shortAddress ?? "Wallet"}</span>
+          <ChevronDown className="h-3 w-3 text-white/25" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-72">
-        <DropdownMenuLabel>Connected Wallet</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-72 border-white/[0.06] bg-[hsl(225_20%_6%)] backdrop-blur-xl">
+        <DropdownMenuLabel className="text-[11px] uppercase tracking-[0.15em] text-white/30 font-medium">
+          Connected Wallet
+        </DropdownMenuLabel>
 
-        {/* Wallet Address Display */}
         <div className="px-3 py-2">
-          <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-            <div className="text-xs text-muted-foreground mb-1.5">
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+            <div className="text-[10px] uppercase tracking-wider text-white/25 mb-1.5">
               Address
             </div>
-            <code className="text-xs font-mono text-foreground break-all">
+            <code className="text-[11px] font-mono text-white/60 break-all leading-relaxed">
               {walletAddress}
             </code>
           </div>
         </div>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-white/[0.04]" />
 
-        {/* Copy Address */}
-        <DropdownMenuItem onClick={copyAddress} className="gap-3 cursor-pointer">
-          <Copy className="h-4 w-4" />
-          <span>Copy address</span>
+        <DropdownMenuItem onClick={copyAddress} className="gap-3 cursor-pointer text-white/50 hover:text-white/80">
+          <Copy className="h-3.5 w-3.5" />
+          <span className="text-[13px]">Copy address</span>
         </DropdownMenuItem>
 
-        {/* View on BSCScan */}
         <DropdownMenuItem asChild>
           <a
             href={`https://bscscan.com/address/${walletAddress}`}
             target="_blank"
             rel="noreferrer"
-            className="gap-3 cursor-pointer"
+            className="gap-3 cursor-pointer text-white/50 hover:text-white/80"
           >
-            <ExternalLink className="h-4 w-4" />
-            <span>View on BSCScan</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+            <span className="text-[13px]">View on BSCScan</span>
           </a>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-white/[0.04]" />
 
-        {/* Disconnect */}
         <DropdownMenuItem
           onClick={handleDisconnect}
-          className="gap-3 cursor-pointer text-red-400 focus:text-red-400 focus:bg-red-500/10"
+          className="gap-3 cursor-pointer text-red-400/70 focus:text-red-400 focus:bg-red-500/[0.06]"
         >
-          <LogOut className="h-4 w-4" />
-          <span>Disconnect</span>
+          <LogOut className="h-3.5 w-3.5" />
+          <span className="text-[13px]">Disconnect</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

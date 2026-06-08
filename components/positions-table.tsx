@@ -15,7 +15,6 @@ import { useTransactionToasts } from "@/hooks/use-transaction-toasts";
 import { useAprTiers, useCurrentAprBps, useLockOptions, useTotalStaked } from "@/hooks/use-staking-reads";
 import { useClaimPosition, useWithdrawPosition } from "@/hooks/use-staking-writes";
 import { useWithdrawEarly, useEarlyWithdrawalPenalty } from "@/hooks/use-early-withdrawal";
-
 import { useMounted } from "@/hooks/use-mounted";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { RWAN_STAKING_ABI, RWAN_STAKING_ADDRESS } from "@/lib/contracts/rwanStakingAbi";
@@ -24,6 +23,7 @@ import { formatBps, formatDateFromSeconds, formatToken, formatUsd } from "@/lib/
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
 import { EarlyWithdrawModal } from "@/components/modals/early-withdraw-modal";
 import { useCryptoPrices } from "@/components/crypto/use-crypto-prices";
+import { cn } from "@/lib/utils/cn";
 
 export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number }) {
   const mounted = useMounted();
@@ -41,13 +41,11 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
   const { prices } = useCryptoPrices();
   const rwanPriceUsd = prices.find((item) => item.symbol === "$Rwaan")?.priceUsd ?? 0;
 
-  // Track which specific position is being claimed/withdrawn
   const [pendingClaimId, setPendingClaimId] = useState<bigint | null>(null);
   const [pendingWithdrawId, setPendingWithdrawId] = useState<bigint | null>(null);
   const [earlyWithdrawModalOpen, setEarlyWithdrawModalOpen] = useState(false);
   const [selectedPositionForEarlyWithdraw, setSelectedPositionForEarlyWithdraw] = useState<bigint | null>(null);
 
-  // Calculate values (must be before any conditional returns)
   const totalPending = useMemo(
     () => positions.reduce((sum, position) => sum + position.pendingRewards, 0n),
     [positions]
@@ -69,70 +67,25 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
   }, [lockOptions.options]);
 
   const handleClaim = async (positionId: bigint) => {
-    // CRITICAL: Prevent claim if wallet disconnected
-    if (!address) {
-      console.error("[PositionsTable] Cannot claim without connected wallet");
-      return;
-    }
-
+    if (!address) return;
     setPendingClaimId(positionId);
     const hash = await claim(positionId);
-    if (!hash) {
-      setPendingClaimId(null);
-      return;
-    }
-
-    // Find position to get reward amount
+    if (!hash) { setPendingClaimId(null); return; }
     const position = positions.find(p => p.id === positionId);
     const rewardAmount = position ? formatToken(position.pendingRewards, decimals) : "0";
-
-    trackTx(hash, {
-      title: "Claim rewards",
-      successMessage: "Rewards claimed.",
-      errorMessage: "Claim failed.",
-      retry: () => handleClaim(positionId),
-      action: "Claimed",
-      amount: `${rewardAmount} $Rwaan`,
-    });
-    // Trigger confetti celebration
-    confetti({
-      particleCount: isMobile ? 40 : 80,
-      spread: isMobile ? 40 : 60,
-      origin: { y: 0.6 },
-      colors: ["#F3BA2F", "#10B981"], // Gold and Emerald
-    });
-
-    // Clear pending state after transaction is submitted
+    trackTx(hash, { title: "Claim rewards", successMessage: "Rewards claimed.", errorMessage: "Claim failed.", retry: () => handleClaim(positionId), action: "Claimed", amount: `${rewardAmount} $Rwaan` });
+    confetti({ particleCount: isMobile ? 40 : 80, spread: isMobile ? 40 : 60, origin: { y: 0.6 }, colors: ["#F3BA2F", "#10B981"] });
     setPendingClaimId(null);
   };
 
   const handleWithdraw = async (positionId: bigint) => {
-    // CRITICAL: Prevent withdraw if wallet disconnected
-    if (!address) {
-      console.error("[PositionsTable] Cannot withdraw without connected wallet");
-      return;
-    }
-
+    if (!address) return;
     setPendingWithdrawId(positionId);
     const hash = await withdraw(positionId);
-    if (!hash) {
-      setPendingWithdrawId(null);
-      return;
-    }
-
-    // Find position to get staked amount
+    if (!hash) { setPendingWithdrawId(null); return; }
     const position = positions.find(p => p.id === positionId);
     const stakedAmount = position ? formatToken(position.amount, decimals) : "0";
-
-    trackTx(hash, {
-      title: "Withdraw position",
-      successMessage: "Position withdrawn.",
-      errorMessage: "Withdraw failed.",
-      retry: () => handleWithdraw(positionId),
-      action: "Withdrew",
-      amount: `${stakedAmount} $Rwaan`,
-    });
-    // Clear pending state after transaction is submitted
+    trackTx(hash, { title: "Withdraw position", successMessage: "Position withdrawn.", errorMessage: "Withdraw failed.", retry: () => handleWithdraw(positionId), action: "Withdrew", amount: `${stakedAmount} $Rwaan` });
     setPendingWithdrawId(null);
   };
 
@@ -143,278 +96,294 @@ export function PositionsTable({ decimals = RWAN_DECIMALS }: { decimals?: number
 
   const handleConfirmEarlyWithdraw = async () => {
     if (!selectedPositionForEarlyWithdraw || !address) return;
-
     setEarlyWithdrawModalOpen(false);
     setPendingWithdrawId(selectedPositionForEarlyWithdraw);
-
     try {
       const hash = await withdrawEarly?.({
-        address: RWAN_STAKING_ADDRESS,
-        abi: RWAN_STAKING_ABI,
-        functionName: "withdrawEarly",
-        args: [selectedPositionForEarlyWithdraw],
+        address: RWAN_STAKING_ADDRESS, abi: RWAN_STAKING_ABI, functionName: "withdrawEarly", args: [selectedPositionForEarlyWithdraw],
       });
-
-      if (!hash) {
-        setPendingWithdrawId(null);
-        setSelectedPositionForEarlyWithdraw(null);
-        return;
-      }
-
+      if (!hash) { setPendingWithdrawId(null); setSelectedPositionForEarlyWithdraw(null); return; }
       const position = positions.find(p => p.id === selectedPositionForEarlyWithdraw);
       const stakedAmount = position ? formatToken(position.amount, decimals) : "0";
-
-      trackTx(hash, {
-        title: "Early withdrawal",
-        successMessage: "Position withdrawn (35% penalty applied).",
-        errorMessage: "Early withdrawal failed.",
-        retry: handleConfirmEarlyWithdraw,
-        action: "Withdrew Early",
-        amount: `${stakedAmount} $Rwaan`,
-      });
-    } catch (error) {
-      console.error("Early withdrawal error:", error);
-    } finally {
-      setPendingWithdrawId(null);
-      setSelectedPositionForEarlyWithdraw(null);
-    }
+      trackTx(hash, { title: "Early withdrawal", successMessage: "Position withdrawn (35% penalty applied).", errorMessage: "Early withdrawal failed.", retry: handleConfirmEarlyWithdraw, action: "Withdrew Early", amount: `${stakedAmount} $Rwaan` });
+    } catch (error) { console.error("Early withdrawal error:", error); } finally { setPendingWithdrawId(null); setSelectedPositionForEarlyWithdraw(null); }
   };
 
-  // Show skeleton during SSR
   if (!mounted) {
     return (
-      <div className="glass rounded-2xl p-6">
-        <Skeleton className="h-6 w-32 mb-4" />
-        <Skeleton className="h-32 w-full" />
+      <div className="premium-card rounded-2xl p-6 space-y-4">
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-32 w-full rounded-xl" />
       </div>
     );
   }
 
-  // If wallet disconnected, show empty state
   if (!address) {
-    return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm">
-        <EmptyState
-          title="Wallet required"
-          description="Connect your wallet to view your staking positions."
-        />
-      </div>
-    );
+    return <EmptyState title="Wallet required" description="Connect your wallet to view your staking positions." />;
   }
 
-  // If no positions, show empty state
   if (!isLoading && positions.length === 0) {
-    return (
-      <EmptyState
-        title="No positions yet"
-        description="Stake $Rwaan to open your first position. Each stake creates its own reward stream."
-      />
-    );
+    return <EmptyState title="No positions yet" description="Stake $Rwaan to open your first position. Each stake creates its own reward stream." />;
   }
 
   return (
-    <div className="sleek-card interactive-card p-4 md:p-6 border border-white/5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+    <div className="premium-card rounded-2xl p-4 md:p-6 overflow-hidden">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-sm font-semibold">Your positions</div>
-          <div className="text-xs text-[#F3BA2F]/80 font-medium tracking-wide">
-            Total accrued interest: <span className="text-white">{formatToken(totalPending, decimals)} $Rwaan</span>
+          <div className="text-[15px] font-semibold text-white">Your positions</div>
+          <div className="text-[12px] text-white/25 mt-0.5">
+            Accrued interest: <span className="text-[#F3BA2F]/70 font-medium">{formatToken(totalPending, decimals)} $Rwaan</span>
           </div>
         </div>
-        <Badge variant="accent">{positions.length} positions</Badge>
+        <Badge variant="accent">{positions.length} position{positions.length !== 1 ? "s" : ""}</Badge>
       </div>
-      <Table className="min-w-[720px]">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Amount</TableHead>
-            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Plan</TableHead>
-            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">APR</TableHead>
-            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Start Date</TableHead>
-            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Unlock Date</TableHead>
-            <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Accrued Interest</TableHead>
-            <TableHead className="text-right text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading
-            ? Array.from({ length: 3 }).map((_, index) => (
-              <TableRow key={`skeleton-${index}`}>
-                <TableCell colSpan={7}>
-                  <Skeleton className="h-10 w-full" />
-                </TableCell>
-              </TableRow>
-            ))
-            : positions.map((position) => (
-              <PositionRow
-                key={position.id.toString()}
-                position={position}
-                decimals={decimals}
-                onClaim={handleClaim}
-                onWithdraw={handleWithdraw}
-                onEarlyWithdraw={handleRequestEarlyWithdraw}
-                isClaimPending={pendingClaimId === position.id}
-                isWithdrawPending={pendingWithdrawId === position.id}
-                baseAprBps={baseAprBps}
-                lockOption={lockOptionsMap.get(position.lockId)}
-                walletConnected={Boolean(address)}
-                priceUsd={rwanPriceUsd}
-              />
-            ))}
-        </TableBody>
-      </Table>
 
-      {/* Early Withdrawal Modal */}
+      {/* Mobile card layout */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {isLoading
+          ? Array.from({ length: 2 }).map((_, index) => (
+            <Skeleton key={`skeleton-mobile-${index}`} className="h-40 w-full rounded-xl" />
+          ))
+          : positions.map((position) => (
+            <MobilePositionCard
+              key={position.id.toString()}
+              position={position}
+              decimals={decimals}
+              onClaim={handleClaim}
+              onWithdraw={handleWithdraw}
+              onEarlyWithdraw={handleRequestEarlyWithdraw}
+              isClaimPending={pendingClaimId === position.id}
+              isWithdrawPending={pendingWithdrawId === position.id}
+              baseAprBps={baseAprBps}
+              lockOption={lockOptionsMap.get(position.lockId)}
+              walletConnected={Boolean(address)}
+              priceUsd={rwanPriceUsd}
+            />
+          ))}
+      </div>
+
+      {/* Desktop table layout */}
+      <div className="hidden md:block overflow-x-auto">
+        <Table className="min-w-[720px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Amount</TableHead>
+              <TableHead>Plan</TableHead>
+              <TableHead>APR</TableHead>
+              <TableHead>Start Date</TableHead>
+              <TableHead>Unlock Date</TableHead>
+              <TableHead>Accrued Interest</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
+                  <TableCell colSpan={7}><Skeleton className="h-10 w-full rounded-lg" /></TableCell>
+                </TableRow>
+              ))
+              : positions.map((position) => (
+                <PositionRow
+                  key={position.id.toString()}
+                  position={position}
+                  decimals={decimals}
+                  onClaim={handleClaim}
+                  onWithdraw={handleWithdraw}
+                  onEarlyWithdraw={handleRequestEarlyWithdraw}
+                  isClaimPending={pendingClaimId === position.id}
+                  isWithdrawPending={pendingWithdrawId === position.id}
+                  baseAprBps={baseAprBps}
+                  lockOption={lockOptionsMap.get(position.lockId)}
+                  walletConnected={Boolean(address)}
+                  priceUsd={rwanPriceUsd}
+                />
+              ))}
+          </TableBody>
+        </Table>
+      </div>
+
       <EarlyWithdrawModal
         open={earlyWithdrawModalOpen}
         penaltyAmount={
           selectedPositionForEarlyWithdraw
-            ? formatToken(
-              (positions.find(p => p.id === selectedPositionForEarlyWithdraw)?.amount ?? 0n) * 35n / 100n,
-              decimals
-            )
+            ? formatToken((positions.find(p => p.id === selectedPositionForEarlyWithdraw)?.amount ?? 0n) * 35n / 100n, decimals)
             : "0"
         }
         onConfirm={handleConfirmEarlyWithdraw}
-        onClose={() => {
-          setEarlyWithdrawModalOpen(false);
-          setSelectedPositionForEarlyWithdraw(null);
-        }}
+        onClose={() => { setEarlyWithdrawModalOpen(false); setSelectedPositionForEarlyWithdraw(null); }}
       />
     </div>
   );
 }
 
-function PositionRow({
-  position,
-  decimals,
-  onClaim,
-  onWithdraw,
-  onEarlyWithdraw,
-  isClaimPending,
-  isWithdrawPending,
-  baseAprBps,
-  lockOption,
-  walletConnected,
-  priceUsd,
-}: {
-  position: {
-    id: bigint;
-    amount: bigint;
-    weightedAmount: bigint;
-    startTime: bigint;
-    unlockTime: bigint;
-    lockId: bigint;
-    pendingRewards: bigint;
-  };
-  decimals: number;
-  onClaim: (positionId: bigint) => void;
-  onWithdraw: (positionId: bigint) => void;
-  onEarlyWithdraw: (positionId: bigint) => void;
-  isClaimPending: boolean;
-  isWithdrawPending: boolean;
-  baseAprBps: bigint;
-  lockOption?: { id: bigint; duration: bigint; multiplierBps: bigint; active: boolean };
-  walletConnected: boolean;
-  priceUsd: number;
-}) {
-  const now = Math.floor(Date.now() / 1000);
+type PositionProps = {
+  position: { id: bigint; amount: bigint; weightedAmount: bigint; startTime: bigint; unlockTime: bigint; lockId: bigint; pendingRewards: bigint; };
+  decimals: number; onClaim: (positionId: bigint) => void; onWithdraw: (positionId: bigint) => void; onEarlyWithdraw: (positionId: bigint) => void;
+  isClaimPending: boolean; isWithdrawPending: boolean; baseAprBps: bigint;
+  lockOption?: { id: bigint; duration: bigint; multiplierBps: bigint; active: boolean }; walletConnected: boolean; priceUsd: number;
+};
+
+function MobilePositionCard({
+  position, decimals, onClaim, onWithdraw, onEarlyWithdraw, isClaimPending, isWithdrawPending, baseAprBps, lockOption, walletConnected, priceUsd,
+}: PositionProps) {
   const unlockAt = position.unlockTime > 0n ? Number(position.unlockTime) : null;
   const { remaining, isUnlocked } = useCountdown(unlockAt);
-  const plan = lockOption
-    ? STAKING_PLANS.find(
-      (item) => BigInt(item.durationSeconds) === lockOption.duration
-    )
-    : undefined;
+  const plan = lockOption ? STAKING_PLANS.find((item) => BigInt(item.durationSeconds) === lockOption.duration) : undefined;
+  const multiplierBps = position.amount > 0n ? (position.weightedAmount * 10_000n) / position.amount : 10_000n;
+  const effectiveAprBps = baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
+  const isClaimable = position.pendingRewards > 0n;
+  const isFlexible = position.unlockTime === 0n;
 
-  const multiplierBps =
-    position.amount > 0n
-      ? (position.weightedAmount * 10_000n) / position.amount
-      : 10_000n;
-  const effectiveAprBps =
-    baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
+  return (
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
+      {/* Top row: Amount + Plan badge */}
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <div className="text-[14px] font-semibold text-white/80">{formatToken(position.amount, decimals)} $Rwaan</div>
+          <div className="text-[11px] text-white/20 mt-0.5">
+            {priceUsd > 0 ? `≈ ${formatUsd(Number(formatUnits(position.amount, decimals)) * priceUsd)}` : "—"}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] font-medium text-emerald-400/70">{effectiveAprBps ? formatBps(effectiveAprBps) : "—"}</span>
+          <Badge variant="outline" className="text-[10px]">{plan?.label ?? (isFlexible ? "Flexible" : "Custom")}</Badge>
+        </div>
+      </div>
+
+      {/* Dates row */}
+      <div className="flex items-center justify-between text-[11px] text-white/30">
+        <span>Started {formatDateFromSeconds(Number(position.startTime))}</span>
+        <span>
+          {unlockAt
+            ? isUnlocked ? "Unlocked" : `${Math.floor(remaining / 86400)}d ${Math.floor((remaining % 86400) / 3600)}h left`
+            : "Flexible"}
+        </span>
+      </div>
+
+      {/* Timeline */}
+      <PositionTimeline startTime={position.startTime} unlockTime={position.unlockTime} />
+
+      {/* Rewards + Actions */}
+      <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/[0.04]">
+        <div>
+          <div className="text-[10px] text-white/20 uppercase tracking-wider">Accrued</div>
+          <div className="text-[13px] font-medium text-[#F3BA2F]/70">{formatToken(position.pendingRewards, decimals)} $Rwaan</div>
+        </div>
+        <div className="flex gap-2">
+          {walletConnected && (
+            <>
+              <Button
+                size="sm"
+                variant="secondary"
+                className={cn(
+                  "text-[12px] h-8 px-3",
+                  isClaimable && !isClaimPending ? "claim-pulse border-emerald-400/15 text-emerald-400/80 hover:bg-emerald-400/[0.06]" : ""
+                )}
+                disabled={!isClaimable || isClaimPending}
+                onClick={() => onClaim(position.id)}
+              >
+                {isClaimPending ? "..." : "Claim"}
+              </Button>
+              {(isFlexible || isUnlocked) ? (
+                <Button size="sm" className="text-[12px] h-8 px-3" disabled={isWithdrawPending} onClick={() => onWithdraw(position.id)}>
+                  {isWithdrawPending ? "..." : "Withdraw"}
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-[11px] h-8 px-2.5 border-amber-500/20 text-amber-400/70 hover:bg-amber-500/[0.06]"
+                  disabled={isWithdrawPending}
+                  onClick={() => onEarlyWithdraw(position.id)}
+                >
+                  {isWithdrawPending ? "..." : "Early (35%)"}
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PositionRow({
+  position, decimals, onClaim, onWithdraw, onEarlyWithdraw, isClaimPending, isWithdrawPending, baseAprBps, lockOption, walletConnected, priceUsd,
+}: PositionProps) {
+  const unlockAt = position.unlockTime > 0n ? Number(position.unlockTime) : null;
+  const { remaining, isUnlocked } = useCountdown(unlockAt);
+  const plan = lockOption ? STAKING_PLANS.find((item) => BigInt(item.durationSeconds) === lockOption.duration) : undefined;
+  const multiplierBps = position.amount > 0n ? (position.weightedAmount * 10_000n) / position.amount : 10_000n;
+  const effectiveAprBps = baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
   const isClaimable = position.pendingRewards > 0n;
   const isFlexible = position.unlockTime === 0n;
 
   return (
     <>
-      <TableRow className="border-b border-white/5 animate-fade-in hover:bg-white/[0.02] transition-colors data-[state=selected]:bg-white/[0.02]">
+      <TableRow className="border-b border-white/[0.03]">
         <TableCell>
           <div className="flex flex-col">
-            <span>{formatToken(position.amount, decimals)} $Rwaan</span>
-            <span className="text-xs text-muted-foreground">
-              {priceUsd > 0
-                ? `≈ ${formatUsd(
-                  Number(formatUnits(position.amount, decimals)) * priceUsd
-                )}`
-                : "—"}
+            <span className="font-medium text-white/80">{formatToken(position.amount, decimals)} $Rwaan</span>
+            <span className="text-[11px] text-white/20 mt-0.5">
+              {priceUsd > 0 ? `≈ ${formatUsd(Number(formatUnits(position.amount, decimals)) * priceUsd)}` : "—"}
             </span>
           </div>
         </TableCell>
-        <TableCell>{plan?.label ?? (isFlexible ? "Flexible" : "Custom")}</TableCell>
-        <TableCell>{effectiveAprBps ? formatBps(effectiveAprBps) : "—"}</TableCell>
-        <TableCell>{formatDateFromSeconds(Number(position.startTime))}</TableCell>
+        <TableCell>
+          <span className="text-white/60">{plan?.label ?? (isFlexible ? "Flexible" : "Custom")}</span>
+        </TableCell>
+        <TableCell>
+          <span className="text-emerald-400/70 font-medium">{effectiveAprBps ? formatBps(effectiveAprBps) : "—"}</span>
+        </TableCell>
+        <TableCell><span className="text-white/40">{formatDateFromSeconds(Number(position.startTime))}</span></TableCell>
         <TableCell>
           {unlockAt ? (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="cursor-default">
-                    {formatDateFromSeconds(unlockAt)}
-                  </span>
+                  <span className="cursor-default text-white/40">{formatDateFromSeconds(unlockAt)}</span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {isUnlocked
-                    ? "Position unlocked."
-                    : `${Math.floor(remaining / 86400)}d ${Math.floor(
-                      (remaining % 86400) / 3600
-                    )}h remaining`}
+                  {isUnlocked ? "Position unlocked." : `${Math.floor(remaining / 86400)}d ${Math.floor((remaining % 86400) / 3600)}h remaining`}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           ) : (
-            "Flexible"
+            <span className="text-emerald-400/50 text-[12px] font-medium">Flexible</span>
           )}
         </TableCell>
         <TableCell>
-          {`${formatToken(position.pendingRewards, decimals)} $Rwaan`}
+          <span className="text-[#F3BA2F]/70 font-medium">{formatToken(position.pendingRewards, decimals)} $Rwaan</span>
         </TableCell>
         <TableCell className="text-right">
           <div className="flex flex-wrap justify-end gap-2">
-            {/* CRITICAL: Only show buttons if wallet connected */}
             {!walletConnected ? (
-              <div className="text-xs text-muted-foreground italic">
-                Wallet required
-              </div>
+              <span className="text-[11px] text-white/20 italic">Wallet required</span>
             ) : (
               <>
                 <Button
                   size="sm"
                   variant="secondary"
-                  className={isClaimable && !isClaimPending ? "claim-pulse" : ""}
+                  className={isClaimable && !isClaimPending ? "claim-pulse border-emerald-400/15 text-emerald-400/80 hover:bg-emerald-400/[0.06]" : ""}
                   disabled={!isClaimable || isClaimPending}
                   onClick={() => onClaim(position.id)}
                 >
                   {isClaimPending ? "Claiming..." : "Claim"}
                 </Button>
-                {/* Normal Withdraw Button - Only enabled if unlocked or flexible */}
                 {(isFlexible || isUnlocked) ? (
-                  <Button
-                    size="sm"
-                    disabled={isWithdrawPending}
-                    onClick={() => onWithdraw(position.id)}
-                  >
+                  <Button size="sm" disabled={isWithdrawPending} onClick={() => onWithdraw(position.id)}>
                     {isWithdrawPending ? "Withdrawing..." : "Withdraw"}
                   </Button>
                 ) : (
-                  /* Early Withdraw Button - For locked positions before unlock */
                   <Button
                     size="sm"
                     variant="outline"
-                    className="border-amber-500/50 text-amber-500 hover:bg-amber-500/10"
+                    className="border-amber-500/20 text-amber-400/70 hover:bg-amber-500/[0.06]"
                     disabled={isWithdrawPending}
                     onClick={() => onEarlyWithdraw(position.id)}
                   >
-                    {isWithdrawPending ? "Withdrawing..." : "Withdraw Early (35% penalty)"}
+                    {isWithdrawPending ? "Withdrawing..." : "Early Withdraw (35%)"}
                   </Button>
                 )}
               </>
@@ -423,33 +392,23 @@ function PositionRow({
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={7} className="pb-5 pt-1">
-          <PositionTimeline
-            startTime={position.startTime}
-            unlockTime={position.unlockTime}
-          />
+        <TableCell colSpan={7} className="pb-4 pt-1">
+          <PositionTimeline startTime={position.startTime} unlockTime={position.unlockTime} />
         </TableCell>
       </TableRow>
     </>
   );
 }
 
-function PositionTimeline({
-  startTime,
-  unlockTime,
-}: {
-  startTime: bigint;
-  unlockTime: bigint;
-}) {
+function PositionTimeline({ startTime, unlockTime }: { startTime: bigint; unlockTime: bigint }) {
   const start = Number(startTime);
   const unlock = unlockTime > 0n ? Number(unlockTime) : null;
   const now = Math.floor(Date.now() / 1000);
-  const accrualStart = start;
 
   if (!unlock) {
     return (
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="rounded-full bg-emerald-400/80 px-2 py-0.5 text-[10px] font-semibold text-black">
+      <div className="flex items-center gap-2.5 text-[11px] text-white/20">
+        <span className="rounded-md bg-emerald-400/[0.08] border border-emerald-400/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-400/80">
           Flexible
         </span>
         <span>Rewards accrue immediately.</span>
@@ -459,24 +418,19 @@ function PositionTimeline({
 
   const total = Math.max(unlock - start, 1);
   const progress = Math.min(Math.max((now - start) / total, 0), 1);
-  const progressPct = `${Math.round(progress * 100)}%`;
+  const pct = `${Math.round(progress * 100)}%`;
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+      <div className="flex items-center justify-between text-[10px] text-white/15">
         <span>Start {formatDateFromSeconds(start)}</span>
         <span>Unlock {formatDateFromSeconds(unlock)}</span>
       </div>
-      <div className="relative h-2 w-full rounded-full bg-white/10">
-        <div
-          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-400 to-amber-300"
-          style={{ width: progressPct }}
-        />
-        <span className="absolute -left-1 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)]" />
-        <span className="absolute -right-1 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
+      <div className="relative h-1.5 w-full rounded-full bg-white/[0.04] overflow-hidden">
+        <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-400/80 to-[#F3BA2F]/80" style={{ width: pct }} />
       </div>
-      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-        <span>Claimable anytime.</span>
+      <div className="flex items-center justify-between text-[10px] text-white/15">
+        <span>Claimable anytime</span>
         <span>{Math.round(progress * 100)}% elapsed</span>
       </div>
     </div>

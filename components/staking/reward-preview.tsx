@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
+import { Calculator, TrendingUp } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,13 +38,10 @@ export function RewardPreview() {
   );
 
   const baseAprBps = useMemo(() => {
-    // First try: Use on-chain currentAprBps
     if (currentApr.data !== undefined && currentApr.data !== null) {
       const aprValue = BigInt(currentApr.data);
       if (aprValue > 0n) return aprValue;
     }
-    
-    // Second try: Calculate from TVL and tiers
     if (totalStaked.data !== undefined && totalStaked.data !== null) {
       const tiers = aprTiers.tiers.filter(Boolean) as AprTier[];
       if (tiers.length > 0) {
@@ -51,16 +49,12 @@ export function RewardPreview() {
         if (calculated > 0n) return calculated;
       }
     }
-    
-    // Fallback: Return the default APR from constants (1600 bps = 16%)
     return 1600n;
   }, [currentApr.data, totalStaked.data, aprTiers.tiers]);
 
   const selectedPlan = planOptions.find((plan) => plan.id === selectedPlanId);
   const selectedOption = lockOptions.options
-    .filter(
-      (option): option is NonNullable<typeof option> => Boolean(option)
-    )
+    .filter((option): option is NonNullable<typeof option> => Boolean(option))
     .find(
       (option) =>
         Boolean(selectedPlan) &&
@@ -96,77 +90,91 @@ export function RewardPreview() {
       whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
       viewport={isMobile ? undefined : { once: true, amount: 0.2 }}
       transition={isMobile ? { duration: 0 } : { duration: 0.3 }}
-      className="glass glass-solid interactive-card rounded-2xl p-5 sm:p-6"
+      className="premium-card rounded-2xl overflow-hidden"
     >
-      <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-        Staking simulator
+      {/* Header */}
+      <div className="flex items-center gap-2.5 px-4 pt-4 sm:px-6 sm:pt-6">
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#F3BA2F]/10 bg-[#F3BA2F]/[0.06]">
+          <Calculator className="h-3.5 w-3.5 text-[#F3BA2F]" />
+        </span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/35">
+          Staking Simulator
+        </span>
       </div>
-      <div className="mt-3 grid gap-3 sm:gap-4 md:grid-cols-[1.1fr_1fr]">
-        <div className="space-y-3">
-          <Input
-            value={amount}
-            onChange={(event) => setAmount(event.target.value)}
-            placeholder="Amount to stake"
-            inputMode="decimal"
-          />
-          <div className="text-xs text-muted-foreground">
-            {amountUsd !== null ? `≈ ${formatUsd(amountUsd)}` : "—"}
+
+      <div className="p-4 sm:p-6 pt-3 sm:pt-4">
+        <div className="grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-[1.1fr_1fr]">
+          {/* Left: Inputs */}
+          <div className="space-y-3">
+            <Input
+              value={amount}
+              onChange={(event) => setAmount(event.target.value)}
+              placeholder="Amount to stake"
+              inputMode="decimal"
+            />
+            <div className="text-[12px] text-white/25 pl-1">
+              {amountUsd !== null ? `≈ ${formatUsd(amountUsd)}` : "—"}
+            </div>
+            <Select
+              value={selectedPlanId}
+              onValueChange={setSelectedPlanId}
+              onOpenChange={(open) => {
+                if (open && typeof document !== "undefined") {
+                  (document.activeElement as HTMLElement | null)?.blur();
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select plan" />
+              </SelectTrigger>
+              <SelectContent>
+                {planOptions.map((plan) => (
+                  <SelectItem key={plan.id} value={plan.id}>
+                    {plan.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-3 text-[12px] text-white/25 pl-1">
+              <span>Base APR: <span className="text-white/50">{baseAprBps ? formatBps(baseAprBps) : "—"}</span></span>
+              <span className="h-3 w-px bg-white/[0.06]" />
+              <span>Multiplier: <span className="text-white/50">
+                {!mounted ? (
+                  <Skeleton className="inline-block h-3.5 w-6" />
+                ) : (
+                  `${Number(multiplierBps) / 10_000}x`
+                )}
+              </span></span>
+            </div>
           </div>
-          <Select
-            value={selectedPlanId}
-            onValueChange={setSelectedPlanId}
-            onOpenChange={(open) => {
-              if (open && typeof document !== "undefined") {
-                (document.activeElement as HTMLElement | null)?.blur();
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select plan" />
-            </SelectTrigger>
-            <SelectContent>
-              {planOptions.map((plan) => (
-                <SelectItem key={plan.id} value={plan.id}>
-                  {plan.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Base APR:</span>
-            <span className="text-foreground">
-              {baseAprBps ? formatBps(baseAprBps) : "—"}
-            </span>
-            <span>· Multiplier:</span>
-            <span className="text-foreground">
-              {!mounted ? (
-                <Skeleton className="inline-block h-4 w-8" />
-              ) : (
-                `${Number(multiplierBps) / 10_000}x`
-              )}
-            </span>
+
+          {/* Right: Result */}
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="h-3.5 w-3.5 text-emerald-400/60" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/25">
+                Estimated rewards
+              </span>
+            </div>
+            <div className="text-2xl font-bold text-white">
+              {yearlyReward.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              <span className="text-sm font-normal text-white/30 ml-1.5">$Rwaan/year</span>
+            </div>
+            <div className="mt-2 text-[13px] text-white/35">
+              {selectedPlanId === "flexible"
+                ? `~${periodReward.toLocaleString(undefined, { maximumFractionDigits: 2 })} $Rwaan/month`
+                : `~${periodReward.toLocaleString(undefined, { maximumFractionDigits: 2 })} $Rwaan over ${selectedPlan?.label}`}
+            </div>
+            <div className="mt-4 pt-3 border-t border-white/[0.04] text-[11px] text-white/20">
+              Estimates use the current APR tier and assume no compounding.
+            </div>
           </div>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            Estimated rewards
-          </div>
-          <div className="mt-3 text-2xl font-semibold">
-            {yearlyReward.toLocaleString(undefined, { maximumFractionDigits: 2 })} $Rwaan/year
-          </div>
-          <div className="mt-2 text-sm text-muted-foreground">
-            {selectedPlanId === "flexible"
-              ? `~${periodReward.toLocaleString(undefined, { maximumFractionDigits: 2 })} $Rwaan/month`
-              : `~${periodReward.toLocaleString(undefined, { maximumFractionDigits: 2 })} $Rwaan over ${selectedPlan?.label}`}
-          </div>
-          <div className="mt-3 text-xs text-muted-foreground">
-            Estimates use the current APR tier and assume no compounding.
-          </div>
+
+        <div className="mt-4 text-[11px] text-white/20">
+          Rewards accrue immediately and can be claimed anytime.
+          Estimates use current APR tiers and live emissions.
         </div>
-      </div>
-      <div className="mt-4 text-xs text-muted-foreground">
-        Rewards accrue immediately and can be claimed anytime.
-        Estimates use current APR tiers and live emissions.
       </div>
     </motion.div>
   );

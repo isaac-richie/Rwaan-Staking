@@ -9,6 +9,14 @@ const config: Config = {
     "./lib/**/*.{ts,tsx}",
   ],
   theme: {
+    screens: {
+      xs: "475px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
     extend: {
       fontFamily: {
         sans: ["var(--font-space)", "system-ui", "sans-serif"],
@@ -28,119 +36,123 @@ const config: Config = {
         border: "hsl(var(--border))",
         ring: "hsl(var(--ring))",
         glow: "hsl(var(--glow))",
-        // BNB Chain vibrant accents
+        gold: {
+          50: "hsl(var(--gold-50))",
+          DEFAULT: "hsl(var(--gold-100))",
+          deep: "hsl(var(--gold-200))",
+          dim: "hsl(var(--gold-dim))",
+        },
         emerald: {
-          muted: "hsl(var(--emerald-muted))",
           DEFAULT: "hsl(var(--emerald))",
+          dim: "hsl(var(--emerald-dim))",
+          muted: "hsl(var(--emerald-dim))",
         },
         violet: {
-          muted: "hsl(var(--violet-muted))",
           DEFAULT: "hsl(var(--violet))",
+          dim: "hsl(var(--violet-dim))",
+          muted: "hsl(var(--violet-dim))",
         },
-        navy: "hsl(var(--navy))",
+        surface: {
+          0: "hsl(var(--surface-0))",
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          3: "hsl(var(--surface-3))",
+        },
+        navy: "hsl(225 20% 12%)",
       },
       borderRadius: {
         xl: "1rem",
         "2xl": "1.25rem",
+        "3xl": "1.5rem",
       },
       boxShadow: {
         glass:
-          "0 1px 0 rgba(255,255,255,0.06) inset, 0 24px 80px rgba(0,0,0,0.45)",
-        glow: "0 0 16px rgba(250, 204, 21, 0.16)",
+          "0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 60px -12px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(243, 186, 47, 0.12)",
+        "glow-lg": "0 0 40px rgba(243, 186, 47, 0.15), 0 0 80px rgba(243, 186, 47, 0.06)",
+        "card-hover":
+          "0 20px 60px -12px rgba(0,0,0,0.6), 0 0 40px -8px rgba(243, 186, 47, 0.05)",
       },
       backgroundImage: {
         "radial-glow":
-          "radial-gradient(circle at 20% 20%, rgba(250, 204, 21, 0.18), transparent 55%), radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.08), transparent 45%)",
+          "radial-gradient(ellipse at 25% 20%, rgba(243, 186, 47, 0.1), transparent 55%)",
         "panel-gradient":
-          "linear-gradient(135deg, rgba(148, 163, 184, 0.08), rgba(15, 23, 42, 0.4))",
+          "linear-gradient(135deg, rgba(148, 163, 184, 0.04), rgba(15, 23, 42, 0.3))",
       },
       transitionTimingFunction: {
         "soft-spring": "cubic-bezier(0.16, 1, 0.3, 1)",
       },
       keyframes: {
         "gradient-shift": {
-          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.6" },
-          "50%": { transform: "translate3d(-6%, 4%, 0)", opacity: "0.85" },
-          "100%": { transform: "translate3d(4%, -3%, 0)", opacity: "0.6" },
+          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.5" },
+          "50%": { transform: "translate3d(-4%, 3%, 0)", opacity: "0.7" },
+          "100%": { transform: "translate3d(3%, -2%, 0)", opacity: "0.5" },
         },
         "aura-breathe": {
-          "0%": {
-            transform: "scale(1) translate3d(0, 0, 0)",
-            opacity: "0.5"
-          },
-          "33%": {
-            transform: "scale(1.05) translate3d(-3%, 2%, 0)",
-            opacity: "0.7"
-          },
-          "66%": {
-            transform: "scale(1.03) translate3d(3%, -2%, 0)",
-            opacity: "0.65"
-          },
-          "100%": {
-            transform: "scale(1) translate3d(0, 0, 0)",
-            opacity: "0.5"
-          },
+          "0%": { transform: "scale(1) translate3d(0, 0, 0)", opacity: "0.4" },
+          "33%": { transform: "scale(1.03) translate3d(-2%, 1%, 0)", opacity: "0.55" },
+          "66%": { transform: "scale(1.02) translate3d(2%, -1%, 0)", opacity: "0.5" },
+          "100%": { transform: "scale(1) translate3d(0, 0, 0)", opacity: "0.4" },
         },
         "hero-glow": {
-          "0%": { transform: "scale(1)", opacity: "0.25" },
-          "50%": { transform: "scale(1.03)", opacity: "0.35" },
-          "100%": { transform: "scale(1)", opacity: "0.25" },
+          "0%": { transform: "scale(1)", opacity: "0.2" },
+          "50%": { transform: "scale(1.02)", opacity: "0.3" },
+          "100%": { transform: "scale(1)", opacity: "0.2" },
         },
         "particle-float": {
-          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.15" },
-          "50%": { transform: "translate3d(2%, -8%, 0)", opacity: "0.35" },
-          "100%": { transform: "translate3d(-2%, -16%, 0)", opacity: "0.15" },
+          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.12" },
+          "50%": { transform: "translate3d(2%, -8%, 0)", opacity: "0.25" },
+          "100%": { transform: "translate3d(-2%, -16%, 0)", opacity: "0.12" },
         },
         "particle-drift": {
-          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.12" },
-          "50%": { transform: "translate3d(-3%, -10%, 0)", opacity: "0.3" },
-          "100%": { transform: "translate3d(3%, -20%, 0)", opacity: "0.08" },
+          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.1" },
+          "50%": { transform: "translate3d(-3%, -10%, 0)", opacity: "0.22" },
+          "100%": { transform: "translate3d(3%, -20%, 0)", opacity: "0.06" },
         },
         "orb-float-slow": {
-          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.55" },
-          "50%": { transform: "translate3d(4%, -6%, 0)", opacity: "0.8" },
-          "100%": { transform: "translate3d(-3%, 3%, 0)", opacity: "0.55" },
+          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.4" },
+          "50%": { transform: "translate3d(3%, -4%, 0)", opacity: "0.6" },
+          "100%": { transform: "translate3d(-2%, 2%, 0)", opacity: "0.4" },
         },
         "orb-float-slower": {
-          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.4" },
-          "50%": { transform: "translate3d(-5%, 4%, 0)", opacity: "0.7" },
-          "100%": { transform: "translate3d(3%, -2%, 0)", opacity: "0.4" },
+          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.3" },
+          "50%": { transform: "translate3d(-4%, 3%, 0)", opacity: "0.5" },
+          "100%": { transform: "translate3d(2%, -1%, 0)", opacity: "0.3" },
         },
         "orb-drift": {
-          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.25" },
-          "50%": { transform: "translate3d(6%, 2%, 0)", opacity: "0.45" },
-          "100%": { transform: "translate3d(-4%, -3%, 0)", opacity: "0.25" },
+          "0%": { transform: "translate3d(0, 0, 0)", opacity: "0.2" },
+          "50%": { transform: "translate3d(5%, 1%, 0)", opacity: "0.35" },
+          "100%": { transform: "translate3d(-3%, -2%, 0)", opacity: "0.2" },
         },
-        // BNB Liquid Atmosphere - Volumetric Bubble Drifts
         "liquid-drift-1": {
-          "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.12" },
-          "33%": { transform: "translate3d(-4%, 3%, 0) scale(1.05)", opacity: "0.09" },
-          "66%": { transform: "translate3d(2%, -2%, 0) scale(0.98)", opacity: "0.11" },
-          "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.12" },
+          "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.1" },
+          "33%": { transform: "translate3d(-3%, 2%, 0) scale(1.03)", opacity: "0.07" },
+          "66%": { transform: "translate3d(1%, -1%, 0) scale(0.98)", opacity: "0.09" },
+          "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.1" },
         },
         "liquid-drift-2": {
-          "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.10" },
-          "40%": { transform: "translate3d(3%, -4%, 0) scale(1.08)", opacity: "0.08" },
-          "70%": { transform: "translate3d(-3%, 2%, 0) scale(0.95)", opacity: "0.10" },
-          "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.10" },
-        },
-        "liquid-drift-3": {
-          "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.09" },
-          "35%": { transform: "translate3d(5%, 2%, 0) scale(1.06)", opacity: "0.07" },
-          "65%": { transform: "translate3d(-2%, -3%, 0) scale(0.97)", opacity: "0.09" },
-          "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.09" },
-        },
-        "liquid-drift-4": {
           "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.08" },
-          "38%": { transform: "translate3d(-5%, -3%, 0) scale(1.07)", opacity: "0.06" },
-          "68%": { transform: "translate3d(3%, 4%, 0) scale(0.96)", opacity: "0.08" },
+          "40%": { transform: "translate3d(2%, -3%, 0) scale(1.05)", opacity: "0.06" },
+          "70%": { transform: "translate3d(-2%, 1%, 0) scale(0.96)", opacity: "0.08" },
           "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.08" },
         },
+        "liquid-drift-3": {
+          "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.07" },
+          "35%": { transform: "translate3d(4%, 1%, 0) scale(1.04)", opacity: "0.05" },
+          "65%": { transform: "translate3d(-1%, -2%, 0) scale(0.97)", opacity: "0.07" },
+          "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.07" },
+        },
+        "liquid-drift-4": {
+          "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.06" },
+          "38%": { transform: "translate3d(-4%, -2%, 0) scale(1.05)", opacity: "0.04" },
+          "68%": { transform: "translate3d(2%, 3%, 0) scale(0.97)", opacity: "0.06" },
+          "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.06" },
+        },
         "liquid-drift-5": {
-          "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.11" },
-          "36%": { transform: "translate3d(4%, -5%, 0) scale(1.04)", opacity: "0.08" },
-          "72%": { transform: "translate3d(-3%, 2%, 0) scale(0.98)", opacity: "0.10" },
-          "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.11" },
+          "0%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.09" },
+          "36%": { transform: "translate3d(3%, -4%, 0) scale(1.03)", opacity: "0.06" },
+          "72%": { transform: "translate3d(-2%, 1%, 0) scale(0.98)", opacity: "0.08" },
+          "100%": { transform: "translate3d(0, 0, 0) scale(1)", opacity: "0.09" },
         },
         "gradient-pan": {
           "0%": { backgroundPosition: "0% 50%" },
@@ -148,46 +160,21 @@ const config: Config = {
           "100%": { backgroundPosition: "0% 50%" },
         },
         "pulse-glow": {
-          "0%, 100%": {
-            opacity: "0.5",
-            transform: "scale(1)"
-          },
-          "50%": {
-            opacity: "0.8",
-            transform: "scale(1.05)"
-          },
+          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
+          "50%": { opacity: "0.65", transform: "scale(1.03)" },
         },
         "capital-breathe": {
-          "0%, 100%": {
-            transform: "scale(1)",
-            opacity: "0.7",
-          },
-          "50%": {
-            transform: "scale(1.015)",
-            opacity: "0.9",
-          },
+          "0%, 100%": { transform: "scale(1)", opacity: "0.6" },
+          "50%": { transform: "scale(1.01)", opacity: "0.8" },
         },
         "halo-expand": {
-          "0%, 100%": {
-            transform: "scale(1)",
-            opacity: "0.3",
-          },
-          "50%": {
-            transform: "scale(1.08)",
-            opacity: "0.5",
-          },
+          "0%, 100%": { transform: "scale(1)", opacity: "0.25" },
+          "50%": { transform: "scale(1.06)", opacity: "0.4" },
         },
         "flow-glow": {
-          "0%, 100%": {
-            opacity: "0.6",
-            transform: "scale(1)",
-          },
-          "50%": {
-            opacity: "0.9",
-            transform: "scale(1.02)",
-          },
+          "0%, 100%": { opacity: "0.5", transform: "scale(1)" },
+          "50%": { opacity: "0.75", transform: "scale(1.01)" },
         },
-        // Toast slide-in animations
         "slide-in-from-right": {
           "0%": { transform: "translateX(100%)", opacity: "0" },
           "100%": { transform: "translateX(0)", opacity: "1" },
@@ -223,7 +210,6 @@ const config: Config = {
         "orb-float-slow": "orb-float-slow 38s ease-in-out infinite",
         "orb-float-slower": "orb-float-slower 44s ease-in-out infinite",
         "orb-drift": "orb-drift 34s ease-in-out infinite",
-        // BNB Liquid Atmosphere - Non-synchronized slow drifts
         "liquid-drift-1": "liquid-drift-1 47s ease-in-out infinite",
         "liquid-drift-2": "liquid-drift-2 41s ease-in-out infinite",
         "liquid-drift-3": "liquid-drift-3 38s ease-in-out infinite",
@@ -233,7 +219,6 @@ const config: Config = {
         "flow-glow": "flow-glow 18s ease-in-out infinite",
         "capital-breathe": "capital-breathe 15s ease-in-out infinite",
         "halo-expand": "halo-expand 15s ease-in-out infinite",
-        // Toast animations
         "slide-in-from-right": "slide-in-from-right 0.3s ease-out",
         "slide-out-to-right": "slide-out-to-right 0.2s ease-in",
         "fade-in": "fade-in 0.2s ease-out",

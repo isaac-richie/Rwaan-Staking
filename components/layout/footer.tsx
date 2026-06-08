@@ -1,19 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle, Twitter, ArrowLeft, Copy } from "lucide-react";
+import { MessageCircle, Twitter, ArrowLeft, ExternalLink, Heart } from "lucide-react";
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
-import { RWAN_STAKING_ADDRESS, STAKING_DAPP_URL } from "@/lib/utils/constants";
-
+import { RWAN_STAKING_ADDRESS, STAKING_DAPP_URL, RWAN_TOKEN_ADDRESS } from "@/lib/utils/constants";
 import { cn } from "@/lib/utils/cn";
-
-const footerFade = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0 },
-};
-
-const linkHover = { y: -2 };
 
 type FooterLinkProps = {
   href: string;
@@ -29,9 +22,10 @@ function FooterLink({ href, label, external = false, onClick }: FooterLinkProps)
         href={href}
         target="_blank"
         rel="noreferrer"
-        className="inline-block text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+        className="group flex items-center gap-1.5 text-[13px] text-white/30 transition-colors duration-200 hover:text-white/70"
       >
         {label}
+        <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
       </a>
     );
   }
@@ -40,7 +34,7 @@ function FooterLink({ href, label, external = false, onClick }: FooterLinkProps)
     <button
       type="button"
       onClick={onClick}
-      className="inline-block text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+      className="text-left text-[13px] text-white/30 transition-colors duration-200 hover:text-white/70"
     >
       {label}
     </button>
@@ -55,29 +49,25 @@ type SocialIconProps = {
 
 function SocialIcon({ href, label, children }: SocialIconProps) {
   return (
-    <motion.a
+    <a
       href={href}
       aria-label={label}
       target="_blank"
       rel="noreferrer"
-      whileHover={{ scale: 1.08 }}
-      transition={{ duration: 0.2 }}
       className={cn(
-        "flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-muted-foreground",
-        "transition-all duration-200 hover:border-primary/40 hover:text-primary hover:shadow-glow",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        "flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.02] text-white/30",
+        "transition-all duration-250 hover:border-[#F3BA2F]/20 hover:bg-[#F3BA2F]/[0.06] hover:text-[#F3BA2F] hover:shadow-[0_0_20px_rgba(243,186,47,0.08)]"
       )}
     >
       {children}
-    </motion.a>
+    </a>
   );
 }
 
 export function Footer() {
-  const [activeDoc, setActiveDoc] = useState<"terms" | "privacy" | "risk" | null>(
-    null
-  );
+  const [activeDoc, setActiveDoc] = useState<"terms" | "privacy" | "risk" | null>(null);
   const { toast } = useToast();
+
   const docContent = useMemo(() => {
     switch (activeDoc) {
       case "terms":
@@ -120,94 +110,145 @@ export function Footer() {
   }, [activeDoc]);
 
   return (
-    <footer
-      id="footer"
-      className="mt-16 border-t border-white/10 bg-[#06080d]"
-    >
-      <div className="mx-auto w-full max-w-6xl px-4 py-12 md:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-          <div className="flex flex-col gap-5">
-            <div className="text-lg font-semibold text-foreground">$Rwaan</div>
-            <p className="text-sm text-muted-foreground">
-              Stake. Earn. Grow.
-            </p>
-            <div className="flex items-center gap-3">
-              <SocialIcon
-                href="https://x.com/RWAN_Official"
-                label="$Rwaan on X"
-              >
-                <Twitter className="h-4 w-4" />
-              </SocialIcon>
-              <SocialIcon
-                href="https://t.me/RWAN_Chat"
-                label="$Rwaan on Telegram"
-              >
-                <MessageCircle className="h-4 w-4" />
-              </SocialIcon>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 items-start text-left">
-            <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Quick Links
-            </div>
-            <div className="flex flex-col gap-3">
-              <FooterLink href={`${STAKING_DAPP_URL}#stake-rwan`} label="Stake Now" />
-              <FooterLink href={`${STAKING_DAPP_URL}#staking-plans`} label="View Plans" />
-              <FooterLink
-                href="#"
-                label="Smart Contract"
-                onClick={() => {
-                  navigator.clipboard.writeText(RWAN_STAKING_ADDRESS);
-                  toast({
-                    title: "Contract address copied",
-                    description: RWAN_STAKING_ADDRESS,
-                  });
-                }}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 items-start text-left">
-            <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Legal
-            </div>
-            <div className="flex flex-col gap-2">
-              <FooterLink
-                href="#"
-                label="Terms of Service"
-                onClick={() => setActiveDoc("terms")}
-              />
-              <FooterLink
-                href="#"
-                label="Privacy Policy"
-                onClick={() => setActiveDoc("privacy")}
-              />
-              <FooterLink
-                href="#"
-                label="Risk Disclosure"
-                onClick={() => setActiveDoc("risk")}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              $Rwaan is a decentralized protocol. Use at your own risk.
-            </p>
-          </div>
-        </div>
+    <footer className="relative mt-10 sm:mt-20 border-t border-white/[0.04]">
+      {/* Subtle top glow */}
+      <div className="pointer-events-none absolute -top-px left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-[#F3BA2F]/15 to-transparent" />
 
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-5 text-xs text-muted-foreground">
-          <span>© 2026 $Rwaan Protocol. All rights reserved.</span>
-          <span className="rounded-full border border-primary/30 bg-white/5 px-4 py-2 text-[11px] text-primary shadow-glow">
-            Built on BNB Chain
-          </span>
+      <div className="bg-[hsl(225_28%_2.5%)]">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-14 md:px-8">
+          <div className="grid gap-8 sm:gap-12 grid-cols-2 md:grid-cols-12">
+            {/* Brand column */}
+            <div className="col-span-2 md:col-span-4 flex flex-col gap-4 sm:gap-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.02] p-0.5">
+                  <Image
+                    src="/logo-rwaan-network.png"
+                    alt="RWAN"
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 rounded-[8px] object-cover"
+                  />
+                </div>
+                <span className="text-[15px] font-semibold tracking-tight text-white">
+                  $Rwaan
+                </span>
+              </div>
+              <p className="text-[13px] leading-relaxed text-white/25 max-w-xs">
+                The premier staking protocol on BNB Smart Chain. Stake with confidence, earn premium yield, grow your portfolio.
+              </p>
+              <div className="flex items-center gap-2.5">
+                <SocialIcon href="https://x.com/RWAN_Official" label="$Rwaan on X">
+                  <Twitter className="h-3.5 w-3.5" />
+                </SocialIcon>
+                <SocialIcon href="https://t.me/RWAN_Chat" label="$Rwaan on Telegram">
+                  <MessageCircle className="h-3.5 w-3.5" />
+                </SocialIcon>
+              </div>
+            </div>
+
+            {/* Quick links */}
+            <div className="col-span-1 md:col-span-3 flex flex-col gap-3 sm:gap-4">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/20">
+                Protocol
+              </span>
+              <nav className="flex flex-col gap-2.5">
+                <FooterLink href={`${STAKING_DAPP_URL}#stake-rwan`} label="Stake Now" />
+                <FooterLink href={`${STAKING_DAPP_URL}#staking-plans`} label="View Plans" />
+                <FooterLink
+                  href="#"
+                  label="Copy Contract"
+                  onClick={() => {
+                    navigator.clipboard.writeText(RWAN_STAKING_ADDRESS);
+                    toast({
+                      title: "Copied",
+                      description: "Staking contract address copied",
+                    });
+                  }}
+                />
+                <FooterLink
+                  href={`https://bscscan.com/address/${RWAN_STAKING_ADDRESS}`}
+                  label="BscScan"
+                  external
+                />
+              </nav>
+            </div>
+
+            {/* Resources */}
+            <div className="col-span-1 md:col-span-2 flex flex-col gap-3 sm:gap-4">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/20">
+                Resources
+              </span>
+              <nav className="flex flex-col gap-2.5">
+                <FooterLink
+                  href={`https://pancakeswap.finance/swap?outputCurrency=${RWAN_TOKEN_ADDRESS}`}
+                  label="Buy $Rwaan"
+                  external
+                />
+                <FooterLink
+                  href={`https://bscscan.com/token/${RWAN_TOKEN_ADDRESS}`}
+                  label="Token Info"
+                  external
+                />
+              </nav>
+            </div>
+
+            {/* Legal */}
+            <div className="col-span-2 md:col-span-3 flex flex-col gap-3 sm:gap-4">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/20">
+                Legal
+              </span>
+              <nav className="flex flex-col gap-2.5">
+                <FooterLink
+                  href="#"
+                  label="Terms of Service"
+                  onClick={() => setActiveDoc("terms")}
+                />
+                <FooterLink
+                  href="#"
+                  label="Privacy Policy"
+                  onClick={() => setActiveDoc("privacy")}
+                />
+                <FooterLink
+                  href="#"
+                  label="Risk Disclosure"
+                  onClick={() => setActiveDoc("risk")}
+                />
+              </nav>
+              <p className="text-[11px] text-white/15 leading-relaxed mt-1">
+                Decentralized protocol. Use at your own risk.
+              </p>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="mt-6 sm:mt-12 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border-t border-white/[0.04] pt-4 sm:pt-6">
+            <span className="text-[11px] text-white/15">
+              &copy; 2026 $Rwaan Protocol. All rights reserved.
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="flex h-1.5 w-1.5 rounded-full bg-[#F3BA2F]/50" />
+              <span className="text-[11px] font-medium text-white/25">
+                Built on BNB Chain
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Document modal */}
       {docContent ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center">
-          <div className="glass glass-solid w-full max-w-2xl rounded-2xl border border-white/10 p-6 shadow-[0_30px_80px_rgba(0,0,0,0.6)]">
-            <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-2xl rounded-2xl border border-white/[0.06] bg-[hsl(225_20%_5%)] p-4 sm:p-6 shadow-[0_30px_80px_rgba(0,0,0,0.7)] max-h-[80vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="flex items-center gap-2 text-[13px] text-white/30 transition-colors hover:text-white/60"
                 onClick={() => {
                   setActiveDoc(null);
                   document.getElementById("footer")?.scrollIntoView({
@@ -216,26 +257,26 @@ export function Footer() {
                   });
                 }}
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-3.5 w-3.5" />
                 Back
               </button>
-              <div className="text-sm font-semibold text-foreground">
+              <span className="text-sm font-semibold text-white">
                 {docContent.title}
-              </div>
+              </span>
               <button
                 type="button"
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="text-[11px] text-white/25 hover:text-white/50 transition-colors"
                 onClick={() => setActiveDoc(null)}
               >
                 Close
               </button>
             </div>
-            <div className="mt-4 space-y-3 text-sm text-muted-foreground">
+            <div className="mt-5 space-y-3 text-[13px] leading-relaxed text-white/40">
               {docContent.body.map((line) => (
                 <p key={line}>{line}</p>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       ) : null}
     </footer>

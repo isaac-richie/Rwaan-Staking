@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useMemo } from "react";
+import { Clock, Zap, Crown, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { MagneticCard } from "@/components/ui/magnetic-card";
@@ -15,10 +16,15 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 import { STAKING_PLANS } from "@/lib/utils/constants";
 import { formatBps, formatDuration } from "@/lib/utils/format";
 import { AprTier, aprForTVL } from "@/lib/utils/staking";
-import { getCardGlow } from "@/lib/utils/card-styles";
 import { cn } from "@/lib/utils/cn";
 
-const cardHover = { y: -6 };
+const planIcons = [Clock, Star, Crown, Zap];
+const planAccents = [
+  { border: "border-white/[0.06]", glow: "hover:shadow-[0_0_30px_rgba(243,186,47,0.06)]", tag: "bg-white/[0.04] text-white/50" },
+  { border: "border-white/[0.06]", glow: "hover:shadow-[0_0_30px_rgba(243,186,47,0.08)]", tag: "bg-[#F3BA2F]/[0.08] text-[#F3BA2F]/80" },
+  { border: "border-[#F3BA2F]/10", glow: "hover:shadow-[0_0_40px_rgba(243,186,47,0.1)]", tag: "bg-[#F3BA2F]/[0.1] text-[#F3BA2F]" },
+  { border: "border-[#F3BA2F]/15", glow: "hover:shadow-[0_0_40px_rgba(243,186,47,0.12)]", tag: "bg-[#F3BA2F]/[0.12] text-[#F3BA2F]" },
+];
 
 export function PlanCards() {
   const mounted = useMounted();
@@ -29,13 +35,10 @@ export function PlanCards() {
   const currentApr = useCurrentAprBps();
 
   const baseAprBps = useMemo(() => {
-    // First try: Use on-chain currentAprBps
     if (currentApr.data !== undefined && currentApr.data !== null) {
       const aprValue = BigInt(currentApr.data);
       if (aprValue > 0n) return aprValue;
     }
-
-    // Second try: Calculate from TVL and tiers
     if (totalStaked.data !== undefined && totalStaked.data !== null) {
       const tiers = aprTiers.tiers.filter(Boolean) as AprTier[];
       if (tiers.length > 0) {
@@ -43,10 +46,15 @@ export function PlanCards() {
         if (calculated > 0n) return calculated;
       }
     }
-
-    // Fallback: Return the default APR from constants (1600 bps = 16%)
     return 1600n;
   }, [currentApr.data, totalStaked.data, aprTiers.tiers]);
+
+  const activePlans = STAKING_PLANS.filter(plan => {
+    const option = lockOptions.options.find(
+      (item) => item && item.duration === BigInt(plan.durationSeconds)
+    );
+    return option && option.active;
+  });
 
   return (
     <motion.div
@@ -56,108 +64,125 @@ export function PlanCards() {
         hidden: { opacity: 0 },
         show: {
           opacity: 1,
-          transition: {
-            staggerChildren: 0.1
-          }
-        }
+          transition: { staggerChildren: 0.1 },
+        },
       }}
-      className="grid gap-4 sm:grid-cols-2"
+      className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2"
     >
-      {STAKING_PLANS.filter(plan => {
-        const option = lockOptions.options.find(
-          (item) => item && item.duration === BigInt(plan.durationSeconds)
-        );
-        return option && option.active;
-      }).map((plan) => (
-        (() => {
-          const option = lockOptions.options
-            .filter(
-              (item): item is NonNullable<typeof item> => Boolean(item)
-            )
-            .find((item) => item.duration === BigInt(plan.durationSeconds));
-          const multiplierBps = option?.multiplierBps ? BigInt(option.multiplierBps) : 10_000n;
-          const effectiveAprBps =
-            baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
+      {activePlans.map((plan, index) => {
+        const option = lockOptions.options
+          .filter((item): item is NonNullable<typeof item> => Boolean(item))
+          .find((item) => item.duration === BigInt(plan.durationSeconds));
+        const multiplierBps = option?.multiplierBps ? BigInt(option.multiplierBps) : 10_000n;
+        const effectiveAprBps =
+          baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
+        const isBestValue = plan.durationSeconds === 31536000;
+        const accent = planAccents[Math.min(index, planAccents.length - 1)];
+        const Icon = planIcons[Math.min(index, planIcons.length - 1)];
 
-          return (
-            <MagneticCard
-              key={plan.id}
-              className={cn("sleek-card interactive-card p-6 sm:p-7 relative", getCardGlow('staking'))}
+        return (
+          <MagneticCard key={plan.id} className="relative">
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
+              }}
+              whileTap={{ scale: 0.98 }}
+              className={cn(
+                "premium-card relative h-full overflow-hidden rounded-2xl p-4 sm:p-6 md:p-7 transition-all duration-300",
+                accent.border,
+                accent.glow,
+              )}
             >
-              <motion.div
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-                }}
-                whileTap={{ scale: 0.98 }}
-                transition={isMobile ? undefined : { duration: 0.2 }}
-                className="h-full"
-              >
-                {/* Add Border Beam to the 12-month (Best Value) plan */}
-                {plan.durationSeconds === 31536000 && (
-                  <BorderBeam size={250} duration={12} delay={9} borderWidth={1.5} colorFrom="#F3BA2F" colorTo="#F3BA2F" />
-                )}
-                <div className="flex items-center justify-between">
+              {/* Border beam on best value */}
+              {isBestValue && (
+                <BorderBeam size={250} duration={12} delay={9} borderWidth={1.5} colorFrom="#F3BA2F" colorTo="#F3BA2F" />
+              )}
+
+              {/* Top row: Icon + Tag + APR badge */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-xl border",
+                    isBestValue
+                      ? "border-[#F3BA2F]/20 bg-[#F3BA2F]/[0.08]"
+                      : "border-white/[0.06] bg-white/[0.03]"
+                  )}>
+                    <Icon className={cn("h-4.5 w-4.5", isBestValue ? "text-[#F3BA2F]" : "text-white/40")} />
+                  </span>
                   <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="h-1 w-1 rounded-full bg-[#F3BA2F]"></span>
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-[#F3BA2F]/80 font-medium">
-                        {plan.label} Plan
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className={cn("text-[10px] uppercase tracking-[0.2em] font-semibold", accent.tag, "px-2 py-0.5 rounded-md")}>
+                        {plan.label}
                       </span>
-                    </div>
-                    <div className="text-3xl font-bold text-white sm:text-4xl">
-                      {formatDuration(plan.durationSeconds)}
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="border-gold-subtle bg-[#F3BA2F]/10 text-[#F3BA2F] px-4 py-1.5 backdrop-blur-md">
-                    {!mounted ? (
-                      <Skeleton className="h-4 w-16 bg-[#F3BA2F]/20" />
-                    ) : effectiveAprBps ? (
-                      <span className="text-sm font-bold tracking-wide flex items-center gap-1">
-                        <NumberTicker value={Number(effectiveAprBps) / 100} decimalPlaces={2} className="text-[#F3BA2F]" />
-                        <span>% APR</span>
-                      </span>
-                    ) : (
-                      "APR —"
-                    )}
-                  </Badge>
-                </div>
-                <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
-                  <div className="flex items-center justify-between">
-                    <span>Lock duration</span>
-                    <span className="text-foreground">
-                      {formatDuration(plan.durationSeconds)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Boost multiplier</span>
-                    <span className="text-foreground">
-                      {!mounted ? (
-                        <Skeleton className="inline-block h-4 w-8" />
-                      ) : (
-                        `${(Number(multiplierBps) / 10000).toFixed(1)}x`
+                      {isBestValue && (
+                        <span className="text-[9px] uppercase tracking-[0.15em] font-bold text-[#F3BA2F] bg-[#F3BA2F]/[0.08] px-1.5 py-0.5 rounded-md border border-[#F3BA2F]/15">
+                          Best Value
+                        </span>
                       )}
-                    </span>
+                    </div>
+                    <div className={cn("text-2xl font-bold sm:text-3xl", isBestValue ? "text-white" : "text-white/90")}>
+                      {formatDuration(plan.durationSeconds)}
+                    </div>
                   </div>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex cursor-default items-center justify-between">
-                          <span>Claiming</span>
-                          <span className="text-foreground">Anytime</span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Rewards accrue immediately and can be claimed anytime.
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
                 </div>
-              </motion.div>
-            </MagneticCard>
-          );
-        })()
-      ))}
+                <Badge
+                  variant="accent"
+                  className={cn(
+                    "px-3 py-1.5 text-sm font-bold tracking-wide",
+                    isBestValue && "shadow-[0_0_12px_rgba(243,186,47,0.15)]"
+                  )}
+                >
+                  {!mounted ? (
+                    <Skeleton className="h-4 w-14 bg-[#F3BA2F]/20" />
+                  ) : effectiveAprBps ? (
+                    <span className="flex items-center gap-0.5">
+                      <NumberTicker value={Number(effectiveAprBps) / 100} decimalPlaces={2} className="text-[#F3BA2F]" />
+                      <span>%</span>
+                    </span>
+                  ) : (
+                    "—"
+                  )}
+                </Badge>
+              </div>
+
+              {/* Divider */}
+              <div className="my-5 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
+              {/* Details grid */}
+              <div className="grid gap-3 text-[13px]">
+                <div className="flex items-center justify-between">
+                  <span className="text-white/30">Lock duration</span>
+                  <span className="font-medium text-white/70">{formatDuration(plan.durationSeconds)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-white/30">Boost multiplier</span>
+                  <span className="font-medium text-white/70">
+                    {!mounted ? (
+                      <Skeleton className="inline-block h-4 w-8" />
+                    ) : (
+                      `${(Number(multiplierBps) / 10000).toFixed(1)}x`
+                    )}
+                  </span>
+                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex cursor-default items-center justify-between">
+                        <span className="text-white/30">Reward claiming</span>
+                        <span className="font-medium text-emerald-400/80">Anytime</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Rewards accrue immediately and can be claimed anytime.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </motion.div>
+          </MagneticCard>
+        );
+      })}
     </motion.div>
   );
 }
