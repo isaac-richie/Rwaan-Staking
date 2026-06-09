@@ -65,8 +65,12 @@ export function RewardPreview() {
     selectedPlanId === "flexible"
       ? 10_000n
       : selectedOption?.multiplierBps ? BigInt(selectedOption.multiplierBps) : 10_000n;
-  const effectiveAprBps =
-    baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
+  const isSelectedPlanActive = selectedPlanId === "flexible" || (selectedOption?.active === true);
+  // Use on-chain APR when plan is active, else use target APR from constants
+  const targetAprForPlan = STAKING_PLANS.find(p => p.id === selectedPlanId)?.targetAprBps ?? 0n;
+  const effectiveAprBps = isSelectedPlanActive && baseAprBps > 0n
+    ? (baseAprBps * multiplierBps) / 10_000n
+    : targetAprForPlan;
 
   const normalizedAmount = amount.replace(/,/g, "").trim();
   const parsedAmount = Number(normalizedAmount);

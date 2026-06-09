@@ -24,25 +24,15 @@ import { bsc } from "wagmi/chains";
 import { createAppKit } from "@reown/appkit/react";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 
-const alchemyRpc = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY?.trim();
-const alchemyRpc2 = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY2?.trim();
-const alchemyRpc3 = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY3?.trim();
-const alchemyRpc4 = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY4?.trim();
-const alchemyRpc5 = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY5?.trim();
-const defaultRpc = process.env.BSC_RPC_URL?.trim() || "https://bsc-dataseed.binance.org";
 const walletConnectProjectId =
   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
 const appName = "Rwaan Staking";
 
+// All RPC calls go through our server-side proxy (/api/rpc).
+// This avoids CORS errors and keeps Alchemy keys out of the browser.
 const rpcUrls = [
-  alchemyRpc,
-  alchemyRpc2,
-  alchemyRpc3,
-  alchemyRpc4,
-  alchemyRpc5,
-  defaultRpc,
-  "https://bsc.publicnode.com",
-].filter(Boolean) as string[];
+  "/api/rpc",
+];
 
 // Bitget wallet adapter references `BitVisionWeb` directly in some environments.
 // Define it to avoid ReferenceError when the extension is not present.

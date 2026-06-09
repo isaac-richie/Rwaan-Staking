@@ -49,13 +49,6 @@ export function PlanCards() {
     return 1600n;
   }, [currentApr.data, totalStaked.data, aprTiers.tiers]);
 
-  const activePlans = STAKING_PLANS.filter(plan => {
-    const option = lockOptions.options.find(
-      (item) => item && item.duration === BigInt(plan.durationSeconds)
-    );
-    return option && option.active;
-  });
-
   return (
     <motion.div
       initial="hidden"
@@ -69,14 +62,17 @@ export function PlanCards() {
       }}
       className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2"
     >
-      {activePlans.map((plan, index) => {
+      {STAKING_PLANS.map((plan, index) => {
         const option = lockOptions.options
           .filter((item): item is NonNullable<typeof item> => Boolean(item))
           .find((item) => item.duration === BigInt(plan.durationSeconds));
+        const isActive = option?.active === true;
         const multiplierBps = option?.multiplierBps ? BigInt(option.multiplierBps) : 10_000n;
-        const effectiveAprBps =
-          baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
-        const isBestValue = plan.durationSeconds === 31536000;
+        // Use on-chain APR when active, fall back to target APR from constants
+        const effectiveAprBps = isActive && baseAprBps > 0n
+          ? (baseAprBps * multiplierBps) / 10_000n
+          : plan.targetAprBps;
+        const isBestValue = plan.id === "plan-1y";
         const accent = planAccents[Math.min(index, planAccents.length - 1)];
         const Icon = planIcons[Math.min(index, planIcons.length - 1)];
 
@@ -92,6 +88,7 @@ export function PlanCards() {
                 "premium-card relative h-full overflow-hidden rounded-2xl p-4 sm:p-6 md:p-7 transition-all duration-300",
                 accent.border,
                 accent.glow,
+                !isActive && "opacity-80",
               )}
             >
               {/* Border beam on best value */}
@@ -120,6 +117,11 @@ export function PlanCards() {
                           Best Value
                         </span>
                       )}
+                      {!isActive && mounted && (
+                        <span className="text-[9px] uppercase tracking-[0.15em] font-bold text-white/40 bg-white/[0.04] px-1.5 py-0.5 rounded-md border border-white/[0.06]">
+                          Coming Soon
+                        </span>
+                      )}
                     </div>
                     <div className={cn("text-2xl font-bold sm:text-3xl", isBestValue ? "text-white" : "text-white/90")}>
                       {formatDuration(plan.durationSeconds)}
@@ -130,7 +132,8 @@ export function PlanCards() {
                   variant="accent"
                   className={cn(
                     "px-3 py-1.5 text-sm font-bold tracking-wide",
-                    isBestValue && "shadow-[0_0_12px_rgba(243,186,47,0.15)]"
+                    isBestValue && "shadow-[0_0_12px_rgba(243,186,47,0.15)]",
+                    !isActive && "opacity-70"
                   )}
                 >
                   {!mounted ? (
@@ -160,8 +163,10 @@ export function PlanCards() {
                   <span className="font-medium text-white/70">
                     {!mounted ? (
                       <Skeleton className="inline-block h-4 w-8" />
-                    ) : (
+                    ) : isActive ? (
                       `${(Number(multiplierBps) / 10000).toFixed(1)}x`
+                    ) : (
+                      <span className="text-white/30">—</span>
                     )}
                   </span>
                 </div>
@@ -170,11 +175,15 @@ export function PlanCards() {
                     <TooltipTrigger asChild>
                       <div className="flex cursor-default items-center justify-between">
                         <span className="text-white/30">Reward claiming</span>
-                        <span className="font-medium text-emerald-400/80">Anytime</span>
+                        <span className={cn("font-medium", isActive ? "text-emerald-400/80" : "text-white/30")}>
+                          {isActive ? "Anytime" : "—"}
+                        </span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      Rewards accrue immediately and can be claimed anytime.
+                      {isActive
+                        ? "Rewards accrue immediately and can be claimed anytime."
+                        : "This plan is not yet active. Check back soon."}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

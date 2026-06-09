@@ -199,10 +199,8 @@ export function StakingActionsPanel() {
           <>
             {(() => {
               const isFlexibleEnabled = lockOptions.options.some((opt) => opt && opt.duration === 0n && opt.active);
-              const activeLockedPlans = STAKING_PLANS.filter((plan) => {
-                const option = lockOptions.options.find((opt) => opt && opt.duration === BigInt(plan.durationSeconds));
-                return option && option.active;
-              });
+              // Show ALL plans — active ones are selectable, inactive show as "Coming Soon"
+              const activeLockedPlans = STAKING_PLANS;
 
               return (
                 <Tabs value={mode} onValueChange={(value) => setMode(value as "flexible" | "locked")}>
@@ -238,13 +236,16 @@ export function StakingActionsPanel() {
 
                   <TabsContent value="locked">
                     <div className="grid gap-2.5 sm:grid-cols-2">
-                      {activeLockedPlans.length > 0 ? (
-                        activeLockedPlans.map((plan) => {
+                      {activeLockedPlans.map((plan) => {
                           const option = lockOptions.options
                             .filter((item): item is NonNullable<typeof item> => Boolean(item))
                             .find((item) => item.duration === BigInt(plan.durationSeconds));
+                          const isPlanActive = option?.active === true;
                           const multiplierBps = option?.multiplierBps ? BigInt(option.multiplierBps) : 10_000n;
-                          const effectiveAprBps = baseAprBps > 0n ? (baseAprBps * multiplierBps) / 10_000n : 0n;
+                          // Use on-chain APR when active, target APR as preview when not yet active
+                          const effectiveAprBps = isPlanActive && baseAprBps > 0n
+                            ? (baseAprBps * multiplierBps) / 10_000n
+                            : plan.targetAprBps;
                           const isSelected = selectedPlanId === plan.id;
 
                           return (
@@ -253,15 +254,18 @@ export function StakingActionsPanel() {
                               type="button"
                               whileHover={isMobile ? undefined : { y: -2 }}
                               whileTap={isMobile ? undefined : { scale: 0.98 }}
-                              onClick={() => setSelectedPlanId(plan.id)}
+                              onClick={() => isPlanActive && setSelectedPlanId(plan.id)}
+                              disabled={!isPlanActive}
                               className={cn(
                                 "relative rounded-xl border px-4 py-3.5 text-left transition-all duration-200 sm:px-5 sm:py-4",
-                                isSelected
-                                  ? "border-[#F3BA2F]/25 bg-[#F3BA2F]/[0.04] shadow-[0_0_20px_rgba(243,186,47,0.08)]"
-                                  : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1] hover:bg-white/[0.03]"
+                                isPlanActive
+                                  ? isSelected
+                                    ? "border-[#F3BA2F]/25 bg-[#F3BA2F]/[0.04] shadow-[0_0_20px_rgba(243,186,47,0.08)]"
+                                    : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1] hover:bg-white/[0.03]"
+                                  : "border-white/[0.04] bg-white/[0.01] opacity-50 cursor-not-allowed"
                               )}
                             >
-                              {isSelected && (
+                              {isSelected && isPlanActive && (
                                 <motion.div
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
@@ -270,23 +274,25 @@ export function StakingActionsPanel() {
                                   <Check className="h-3 w-3 text-black" />
                                 </motion.div>
                               )}
-                              <div className={cn("text-[10px] uppercase tracking-[0.2em] font-medium", isSelected ? "text-[#F3BA2F]/80" : "text-white/25")}>
-                                Plan
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <div className={cn("text-[10px] uppercase tracking-[0.2em] font-medium", isSelected && isPlanActive ? "text-[#F3BA2F]/80" : "text-white/25")}>
+                                  Plan
+                                </div>
+                                {!isPlanActive && (
+                                  <span className="text-[9px] uppercase tracking-[0.1em] font-semibold text-white/30 bg-white/[0.04] px-1.5 py-0.5 rounded-md border border-white/[0.04]">
+                                    Soon
+                                  </span>
+                                )}
                               </div>
-                              <div className={cn("mt-1.5 text-base font-semibold sm:text-lg", isSelected ? "text-white" : "text-white/70")}>
+                              <div className={cn("text-base font-semibold sm:text-lg", isSelected && isPlanActive ? "text-white" : "text-white/70")}>
                                 {plan.label}
                               </div>
-                              <div className={cn("mt-0.5 text-[13px]", isSelected ? "text-[#F3BA2F]/70" : "text-white/25")}>
+                              <div className={cn("mt-0.5 text-[13px]", isSelected && isPlanActive ? "text-[#F3BA2F]/70" : "text-white/25")}>
                                 {effectiveAprBps ? `${formatBps(effectiveAprBps)} APR` : "APR —"}
                               </div>
                             </motion.button>
                           );
-                        })
-                      ) : (
-                        <div className="col-span-full text-center text-[13px] text-white/25 py-8">
-                          No active locked plans available at the moment.
-                        </div>
-                      )}
+                        })}
                     </div>
                   </TabsContent>
                 </Tabs>
